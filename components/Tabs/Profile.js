@@ -1,11 +1,4 @@
-import {
-  View,
-  Text,
-  Button,
-  StyleSheet,
-  TouchableOpacity,
-  Image,
-} from "react-native";
+import { View, Text, Button, StyleSheet, TouchableOpacity, Image } from "react-native";
 import * as React from "react";
 import { FIREBASE_AUTH } from "../../FirebaseConfig";
 import Ionicons from "react-native-vector-icons/Ionicons";
@@ -55,17 +48,9 @@ const Profile = ({ navigation }) => {
           <Ionicons name="arrow-forward" size={20} color="#0D0E0F" />
         </TouchableOpacity>
       </View>
-      <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-        <Ionicons name="log-out-outline" size={20} color="#fff" />
-        <Text style={[styles.buttonTextOut, { marginLeft: 8 }]}>Log out</Text>
+      <TouchableOpacity onPress={handleLogout}>
+        <Button color={"#7F3DFF"} title="Log out" onPress={() => FIREBASE_AUTH.signOut()}></Button>
       </TouchableOpacity>
-      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-        <Text>Profile Screen</Text>
-        <Button
-          title="Log out"
-          onPress={() => FIREBASE_AUTH.signOut()}
-        ></Button>
-      </View>
     </View>
   );
 };

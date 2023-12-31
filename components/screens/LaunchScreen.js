@@ -1,12 +1,5 @@
 import React, { useState } from "react";
-import {
-  View,
-  Image,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  FlatList,
-} from "react-native";
+import { View, Image, Text, StyleSheet, TouchableOpacity, FlatList } from "react-native";
 import AppIntroSlider from "react-native-app-intro-slider";
 const FirstSlide = () => {
   return (
@@ -83,21 +76,20 @@ const LaunchScreen = ({ navigation }) => {
         uri: "https://i.imgur.com/mPMldcU.png",
       },
       text1: "Gain total control of your money",
-      text2: "Become your own money manager and make every cent count",
+      text2: "Become your own money manager ",
     },
     {
       id: 2,
       image: {
-        uri: "https://i.imgur.com/mPMldcU.png",
+        uri: "https://imgur.com/55cKqV7.jpg",
       },
       text1: "Take charge of your finances with ease",
-      text2:
-        "Empower yourself to effortlessly manage and control your finances with our",
+      text2: "Empower yourself to effortlessly manage and control your finances with our",
     },
     {
       id: 3,
       image: {
-        uri: "https://i.imgur.com/mPMldcU.png",
+        uri: "https://i.imgur.com/a8sWwD2.jpg",
       },
       text1: "Planning ahead",
       text2: "Set up your budget for each category so you in control",
@@ -112,13 +104,9 @@ const LaunchScreen = ({ navigation }) => {
               React Native App Intro Slider using AppIntroSlider
             </Text>
             <Text style={styles.paragraphStyle}>
-              This will be your screen when you click Skip from any slide or
-              Done button at last
+              This will be your screen when you click Skip from any slide or Done button at last
             </Text>
-            <Button
-              title="Show Intro Slider again"
-              onPress={() => setShowRealApp(false)}
-            />
+            <Button title="Show Intro Slider again" onPress={() => setShowRealApp(false)} />
           </View>
         </SafeAreaView>
       ) : (
@@ -126,9 +114,12 @@ const LaunchScreen = ({ navigation }) => {
           data={slides}
           renderItem={RenderItem}
           onDone={onDone}
+          onDoneStyle={{ color: "#0D0E0F" }}
           showSkipButton={true}
           onSkip={onSkip}
+          onSkipStyle={{ color: "#0D0E0F" }}
           activeDotStyle={{ backgroundColor: "#7F3DFF" }}
+          style={{ paddingTop: 100 }}
         />
       )}
       <View style={styles.buttonsContainer}>
@@ -158,12 +149,12 @@ const LaunchScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#ffffff",
   },
   slide: {
     width: 390,
     justifyContent: "center",
     alignItems: "center",
+    backgroundColor: "#ffffff",
   },
   introText: {
     flexDirection: "column",
@@ -202,6 +193,7 @@ const styles = StyleSheet.create({
     justifyContent: "flex-end",
     alignItems: "center",
     padding: 20,
+    backgroundColor: "#ffffff",
   },
   button1: {
     backgroundColor: "#EEE5FF",
