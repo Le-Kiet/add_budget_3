@@ -11,13 +11,33 @@ const initialState = {
       name: "Education",
       icon: icons.education,
       color: COLORS.yellow,
+      budget: [
+        {
+          id: 1,
+          total: 300,
+          spent: 100,
+          date: "2024-01", //yyyy-mm
+        },
+        {
+          id: 2,
+          total: 300,
+          spent: 75,
+          date: "2023-12", //yyyy-mm
+        },
+        {
+          id: 3,
+          total: 400,
+          spent: 350,
+          date: "2023-11", //yyyy-mm
+        },
+      ],
       expenses: [
         {
           id: 1,
           title: "Tuition Fee",
           description: "Tuition fee",
           location: "ByProgrammers' tuition center",
-          total: 100.0,
+          total: 350.0,
           status: confirmStatus,
           date: "2023-11-21",
         },
@@ -44,9 +64,9 @@ const initialState = {
           title: "PHP Books",
           description: "PHP books",
           location: "ByProgrammers' Book Store",
-          total: 20.0,
+          total: 200,
           status: confirmStatus,
-          date: "2023-10-21",
+          date: "2024-01-1",
         },
       ],
     },
@@ -55,6 +75,26 @@ const initialState = {
       name: "Nutrition",
       icon: icons.food,
       color: COLORS.lightBlue,
+      budget: [
+        {
+          id: 1,
+          total: 2000,
+          spent: 900,
+          date: "2024-01", //yyyy-mm
+        },
+        {
+          id: 2,
+          total: 3000,
+          spent: 800,
+          date: "2023-12", //yyyy-mm
+        },
+        {
+          id: 2,
+          total: 1200,
+          spent: 400,
+          date: "2023-11", //yyyy-mm
+        },
+      ],
       income: [
         {
           id: 1,
@@ -68,6 +108,24 @@ const initialState = {
       ],
       expenses: [
         {
+          id: 3,
+          title: "Vitamins",
+          description: "Vitamin",
+          location: "ByProgrammers' Pharmacy",
+          total: 250,
+          status: confirmStatus,
+          date: "2023-11-21",
+        },
+        {
+          id: 4,
+          title: "Vitamins",
+          description: "Vitamin",
+          location: "ByProgrammers' Pharmacy",
+          total: 100,
+          status: confirmStatus,
+          date: "2024-01-01",
+        },
+        {
           id: 5,
           title: "Vitamins",
           description: "Vitamin",
@@ -76,7 +134,6 @@ const initialState = {
           status: confirmStatus,
           date: "2023-12-21",
         },
-
         {
           id: 6,
           title: "Protein powder",
@@ -93,6 +150,26 @@ const initialState = {
       name: "Child",
       icon: icons.baby_car,
       color: COLORS.darkgreen,
+      budget: [
+        {
+          id: 1,
+          total: 2000,
+          spent: 900,
+          date: "2024-01", //yyyy-mm
+        },
+        {
+          id: 2,
+          total: 3000,
+          spent: 800,
+          date: "2023-12", //yyyy-mm
+        },
+        {
+          id: 2,
+          total: 1200,
+          spent: 400,
+          date: "2023-11", //yyyy-mm
+        },
+      ],
       income: [
         {
           id: 1,
@@ -148,6 +225,26 @@ const initialState = {
       name: "Beauty & Care",
       icon: icons.healthcare,
       color: COLORS.peach,
+      budget: [
+        {
+          id: 1,
+          total: 2000,
+          spent: 900,
+          date: "2024-01", //yyyy-mm
+        },
+        {
+          id: 2,
+          total: 3000,
+          spent: 800,
+          date: "2023-12", //yyyy-mm
+        },
+        {
+          id: 2,
+          total: 1200,
+          spent: 400,
+          date: "2023-11", //yyyy-mm
+        },
+      ],
       income: [
         {
           id: 1,
@@ -203,6 +300,26 @@ const initialState = {
       name: "Sports",
       icon: icons.sports_icon,
       color: COLORS.purple,
+      budget: [
+        {
+          id: 1,
+          total: 2000,
+          spent: 900,
+          date: "2024-01", //yyyy-mm
+        },
+        {
+          id: 2,
+          total: 3000,
+          spent: 800,
+          date: "2023-12", //yyyy-mm
+        },
+        {
+          id: 2,
+          total: 1200,
+          spent: 400,
+          date: "2023-11", //yyyy-mm
+        },
+      ],
       income: [
         {
           id: 1,
@@ -240,6 +357,26 @@ const initialState = {
       name: "Clothing",
       icon: icons.cloth_icon,
       color: COLORS.red,
+      budget: [
+        {
+          id: 1,
+          total: 2000,
+          spent: 900,
+          date: "2024-01", //yyyy-mm
+        },
+        {
+          id: 2,
+          total: 3000,
+          spent: 800,
+          date: "2023-12", //yyyy-mm
+        },
+        {
+          id: 2,
+          total: 1200,
+          spent: 400,
+          date: "2023-11", //yyyy-mm
+        },
+      ],
       income: [
         {
           id: 1,
@@ -259,7 +396,7 @@ const initialState = {
           location: "ByProgrammers' Mall",
           total: 20.0,
           status: confirmStatus,
-          date: "2023-12-18",
+          date: "2023-11-18",
         },
         {
           id: 18,
@@ -277,6 +414,7 @@ const initialState = {
       name: "Holiday",
       icon: icons.holiday,
       color: COLORS.pink,
+      budget: [],
       income: [
         {
           id: 1,
@@ -314,6 +452,7 @@ const initialState = {
       name: "House",
       icon: icons.house,
       color: COLORS.blue,
+      budget: [],
       expenses: [
         {
           id: 17,
@@ -481,7 +620,15 @@ export const GlobalProvider = ({ children }) => {
       },
     });
   }
-
+  function addBudget(categoryId, budget) {
+    dispatch({
+      type: "ADD_TRANSACTION",
+      payload: {
+        categoryId: categoryId,
+        budget: budget,
+      },
+    });
+  }
   return (
     <GlobalContext.Provider
       value={{
@@ -489,6 +636,7 @@ export const GlobalProvider = ({ children }) => {
         incomes: state.incomes,
         deleteTransaction,
         addTransaction, // Đảm bảo truyền đúng tên hàm ở đây
+        addBudget,
       }}
     >
       {children}

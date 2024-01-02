@@ -1,21 +1,3 @@
-// export default (state, action) => {
-//   switch (action.type) {
-//     case "DELETE_TRANSACTION":
-//       return {
-//         ...state,
-//         transactions: state.transactions.filter(
-//           (transaction) => transaction.id !== action.payload
-//         ),
-//       };
-//     case "ADD_TRANSACTION":
-//       return {
-//         ...state,
-//         transactions: [action.payload, ...state.transactions],
-//       };
-//     default:
-//       return state;
-//   }
-// };
 export default function reducer(state, action) {
   switch (action.type) {
     case "DELETE_TRANSACTION":
@@ -69,7 +51,26 @@ export default function reducer(state, action) {
           return category;
         }),
       };
+    case "ADD_BUDGET":
+      const { budgetId, budget } = action.payload;
+      const categoryToAddBudget = state.transactions.find(
+        (category) => category.id === budgetId
+      );
 
+      if (categoryToAddBudget) {
+        return {
+          ...state,
+          transactions: state.transactions.map((category) =>
+            category.id === budgetId
+              ? {
+                  ...category,
+                  budget: [...category.budget, budget],
+                }
+              : category
+          ),
+        };
+      }
+      return state;
     default:
       return state;
   }

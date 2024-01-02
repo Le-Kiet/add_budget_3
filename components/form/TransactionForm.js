@@ -81,8 +81,7 @@ const TransactionForm = ({ navigation }) => {
   };
   const onSubmit = () => {
     let checkAmount = String(amount);
-    console.log(amount);
-    console.log(selectedTransaction);
+
     if (
       selectedTransaction.length === 0 ||
       description.length === 0 ||
