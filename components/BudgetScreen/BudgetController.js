@@ -19,39 +19,13 @@ import MonthlyBudget from "./MonthlyBudget";
 import { GlobalContext } from "../contextAPI/GlobalState";
 
 const Favorites = ({ navigation }) => {
-  // const { transactions, incomes } = useContext(GlobalContext);
-  // const [budgetCounter, setBudgetCounter] = useState(1);
-  // const [budget, setBudget] = useState(0);
-  // const [goal, setGoal] = useState(0);
-  // const [debt, setDebt] = useState(0);
-  // const [financialBalance, setFinancialBalance] = useState(budget - debt);
-
-  ///////////////////////////
-  // const [todayIndex, setTodayIndex] = useState(0);
-  // const currentDate = new Date();
-  // const year = currentDate.getFullYear();
-  // const month = String(currentDate.getMonth() + 1).padStart(2, "0");
-  // const initialSelectedMonth = `${year}-${month}`;
-  // const [currentPage, setCurrentPage] = useState(1);
-  // const [itemsPerPage, setItemsPerPage] = useState(1);
-  // const [selectedMonth, setSelectedMonth] = useState(getCurrentMonth());
-
-  //11111111111111
   const { transactions, incomes } = useContext(GlobalContext);
-  const [budgetCounter, setBudgetCounter] = useState(1);
-  const [budget, setBudget] = useState(0);
-  const [goal, setGoal] = useState(0);
-  const [debt, setDebt] = useState(0);
-  const [financialBalance, setFinancialBalance] = useState(budget - debt);
 
-  ///////////////////////////
   const [todayIndex, setTodayIndex] = useState(12);
   const currentDate = new Date();
   const year = currentDate.getFullYear();
   const month = String(currentDate.getMonth() + 1).padStart(2, "0");
-  const initialSelectedMonth = `${year}-${month}`;
   const [currentPage, setCurrentPage] = useState(13);
-  const [itemsPerPage, setItemsPerPage] = useState(1);
   const [selectedMonth, setSelectedMonth] = useState(getCurrentMonth());
   const [filteredBudgets, setFilteredBudgets] = useState([]);
 
@@ -131,46 +105,28 @@ const Favorites = ({ navigation }) => {
     transaction.expenses.forEach((expense) => {
       // Lấy giá trị của trường "total" và trường "date" từ mục chi tiêu
       const { total, date } = expense;
-
       // Tách năm và tháng từ trường "date"
       const [year, month] = date.split("-");
-
       // Tìm mục trong mảng "budget" có trường "date" tương ứng
       const budgetItem = transaction.budget.find((item) => item.date === date);
-
-      // Kiểm tra xem mục "budgetItem" có tồn tại hay không
       if (budgetItem) {
-        // Cộng giá trị total vào trường "spent" của mục "budgetItem"
         budgetItem.spent += total;
       }
     });
   });
 
-  // In ra mảng "transactions" đã được cập nhật
   console.log(transactions, "updatedtransactions");
 
   // Khởi tạo mảng totalExpenseInMonth
   let totalExpenseInMonth = [];
-
-  // Duyệt qua từng giao dịch
   transactions.forEach((transaction) => {
-    // Tạo một đối tượng để lưu tổng tiền chi tiêu từng tháng
     let totalExpenseInMonth = {};
-
-    // Duyệt qua từng khoản chi tiêu
     transaction.expenses.forEach((expense) => {
-      // Tách năm và tháng từ trường date
       const [year, month] = expense.date.split("-");
-
-      // Chuyển đổi sang dạng số nguyên
       const totalExpense = parseFloat(expense.total);
-
-      // Kiểm tra xem tháng đã tồn tại trong đối tượng totalExpenseInMonth chưa
       if (totalExpenseInMonth[year] && totalExpenseInMonth[year][month]) {
-        // Nếu tháng đã tồn tại, cộng tổng chi tiêu vào
         totalExpenseInMonth[year][month] += totalExpense;
       } else {
-        // Nếu tháng chưa tồn tại, tạo một mục mới
         if (!totalExpenseInMonth[year]) {
           totalExpenseInMonth[year] = {};
         }
@@ -178,7 +134,6 @@ const Favorites = ({ navigation }) => {
       }
     });
 
-    // Duyệt qua từng tháng trong totalExpenseInMonth và cập nhật spent trong budget
     for (const year in totalExpenseInMonth) {
       for (const month in totalExpenseInMonth[year]) {
         const budget = transaction.budget.find(
@@ -191,159 +146,92 @@ const Favorites = ({ navigation }) => {
     }
   });
 
-  // In ra transactions đã được cập nhật
-  console.log(transactions, "afterbudget");
-  // // Duyệt qua từng giao dịch
-  // transactions.forEach((transaction) => {
-  //   // Duyệt qua từng khoản chi tiêu
-  //   transaction.expenses.forEach((expense) => {
-  //     // Tách năm và tháng từ trường date
-  //     const [year, month] = expense.date.split("-");
-
-  //     // Chuyển đổi sang dạng số nguyên
-  //     const totalExpense = parseFloat(expense.total);
-
-  //     // Kiểm tra xem tháng đã tồn tại trong mảng totalExpenseInMonth chưa
-  //     const existingMonth = totalExpenseInMonth.find(
-  //       (item) => item.year === year && item.month === month
-  //     );
-
-  //     if (existingMonth) {
-  //       // Nếu tháng đã tồn tại, cộng tổng chi tiêu vào spent của budget
-  //       existingMonth.total += totalExpense;
-  //     } else {
-  //       // Nếu tháng chưa tồn tại, thêm một mục mới vào mảng totalExpenseInMonth
-  //       totalExpenseInMonth.push({
-  //         year,
-  //         month,
-  //         total: totalExpense,
-  //       });
-  //     }
-  //   });
-  // });
-
-  // In ra tổng tiền chi tiêu từng tháng
-  console.log(totalExpenseInMonth, "totalExpenseInMonth");
-
-  const indexOfLastMonth = currentPage * itemsPerPage;
-  const indexOfFirstMonth = indexOfLastMonth - itemsPerPage;
-  const currentMonths = monthsInRange.slice(
-    indexOfFirstMonth,
-    indexOfLastMonth
-  );
-
-  const progress = 80;
-
   let backgroundColorOnComplete = "#6CC644";
 
   const addBudget = () => {
     navigation.navigate("AddBudget");
   };
-  const onBudgetChange = (value) => {
-    setBudget(value);
-    updateFinancialBalance(value, debt);
-  };
-  const onGoalChange = (value) => {
-    setGoal(value);
-  };
-
-  const onDebtChange = (value) => {
-    setDebt(value);
-    updateFinancialBalance(budget, value);
-  };
-  const updateFinancialBalance = (budgetValue, debtValue) => {
-    const balance = budgetValue - debtValue;
-    setFinancialBalance(balance);
-  };
-
-  const onSaveBudget = () => {
-    console.log(
-      "Lưu thành công",
-      `Ngân sách hiện tại: ${budget}$, Mục tiêu tài chính: ${goal}$`
-    );
-    Alert.alert("Saved");
-  };
-  const renderBudget = (transactions) => {
-    return (
-      <View>
-        {transactions.map((category) => {
-          if (category.budget.length > 0) {
-            return (
-              <View key={category.id}>
-                <View style={[styles.budgetHeader]}>
-                  <View
-                    style={{
-                      flexDirection: "row",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      marginTop: 10,
-                      borderWidth: 1,
-                      borderRadius: 32,
-                      borderColor: "#91919F",
-                      padding: 3,
-                    }}
-                  >
-                    <Svg width="14" height="14" style={{ margin: 3 }}>
-                      <Circle cx="7" cy="7" r="7" fill="red" />
-                    </Svg>
-                    <Text style={{ marginTop: -3 }}>{category.name}</Text>
-                  </View>
-                  <View>
-                    <Image
-                      source={require("../../assets/warning.png")}
-                      style={{ height: 28, width: 28 }}
-                    ></Image>
-                  </View>
-                </View>
-                {category.budget.map((budgetItem) => {
-                  const progress = (budgetItem.spent / budgetItem.total) * 100;
-                  console.log(progress, "progressbar");
-                  if (progress >= 75) {
-                    backgroundColorOnComplete = "#FF0000"; // Xanh lá cây
-                  } else if (progress >= 50) {
-                    backgroundColorOnComplete = "#FFA500"; // Màu vàng
-                  } else if (progress >= 25) {
-                    backgroundColorOnComplete = "#FFD700"; // Màu cam
-                  } else if (progress >= 0) {
-                    backgroundColorOnComplete = "#6CC644";
-                  }
-                  return (
-                    <View key={budgetItem.date}>
-                      <Text style={{ fontSize: 22, fontWeight: "bold" }}>
-                        Remaining ${budgetItem.total - budgetItem.spent}
-                      </Text>
-                      <ProgressBar
-                        width={200}
-                        value={progress}
-                        backgroundColor={backgroundColorOnComplete}
-                      />
-                      <Text
-                        style={{
-                          fontSize: 14,
-                          color: backgroundColorOnComplete,
-                        }}
-                      >
-                        {budgetItem.spent} of {budgetItem.total}
-                      </Text>
-                      {progress >= 75 && (
-                        <View>
-                          <Text style={{ color: backgroundColorOnComplete }}>
-                            Your budget is running low
-                          </Text>
-                        </View>
-                      )}
-                    </View>
-                  );
-                })}
-              </View>
-            );
-          } else {
-            return null; // Không hiển thị giao dịch nếu không có ngân sách
-          }
-        })}
-      </View>
-    );
-  };
+  // const renderBudget = (transactions) => {
+  //   return (
+  //     <View>
+  //       {transactions.map((category) => {
+  //         if (category.budget.length > 0) {
+  //           return (
+  //             <View key={category.id}>
+  //               <View style={[styles.budgetHeader]}>
+  //                 <View
+  //                   style={{
+  //                     flexDirection: "row",
+  //                     alignItems: "center",
+  //                     justifyContent: "center",
+  //                     marginTop: 10,
+  //                     borderWidth: 1,
+  //                     borderRadius: 32,
+  //                     borderColor: "#91919F",
+  //                     padding: 3,
+  //                   }}
+  //                 >
+  //                   <Svg width="14" height="14" style={{ margin: 3 }}>
+  //                     <Circle cx="7" cy="7" r="7" fill="red" />
+  //                   </Svg>
+  //                   <Text style={{ marginTop: -3 }}>{category.name}</Text>
+  //                 </View>
+  //                 <View>
+  //                   <Image
+  //                     source={require("../../assets/warning.png")}
+  //                     style={{ height: 28, width: 28 }}
+  //                   ></Image>
+  //                 </View>
+  //               </View>
+  //               {category.budget.map((budgetItem) => {
+  //                 const progress = (budgetItem.spent / budgetItem.total) * 100;
+  //                 console.log(progress, "progressbar");
+  //                 if (progress >= 75) {
+  //                   backgroundColorOnComplete = "#FF0000"; // Xanh lá cây
+  //                 } else if (progress >= 50) {
+  //                   backgroundColorOnComplete = "#FFA500"; // Màu vàng
+  //                 } else if (progress >= 25) {
+  //                   backgroundColorOnComplete = "#FFD700"; // Màu cam
+  //                 } else if (progress >= 0) {
+  //                   backgroundColorOnComplete = "#6CC644";
+  //                 }
+  //                 return (
+  //                   <View key={budgetItem.date}>
+  //                     <Text style={{ fontSize: 22, fontWeight: "bold" }}>
+  //                       Remaining ${budgetItem.total - budgetItem.spent}
+  //                     </Text>
+  //                     <ProgressBar
+  //                       width={200}
+  //                       value={progress}
+  //                       backgroundColor={backgroundColorOnComplete}
+  //                     />
+  //                     <Text
+  //                       style={{
+  //                         fontSize: 14,
+  //                         color: backgroundColorOnComplete,
+  //                       }}
+  //                     >
+  //                       {budgetItem.spent} of {budgetItem.total}
+  //                     </Text>
+  //                     {progress >= 75 && (
+  //                       <View>
+  //                         <Text style={{ color: backgroundColorOnComplete }}>
+  //                           Your budget is running low
+  //                         </Text>
+  //                       </View>
+  //                     )}
+  //                   </View>
+  //                 );
+  //               })}
+  //             </View>
+  //           );
+  //         } else {
+  //           return null; // Không hiển thị giao dịch nếu không có ngân sách
+  //         }
+  //       })}
+  //     </View>
+  //   );
+  // };
   useEffect(() => {
     const todayIndex = monthsInRange.findIndex(
       (item) => item === selectedMonth

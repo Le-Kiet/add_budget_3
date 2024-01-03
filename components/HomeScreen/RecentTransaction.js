@@ -62,55 +62,6 @@ const RecentTransaction = ({ transactions, incomes }) => {
   const earliestTransactions = sortedTransactions.slice(0, 5);
   return (
     <View>
-      <View>
-        {/* {transactions.map((transaction, index) => (
-        <ListItem
-          key={index}
-          title={transaction.title}
-          subtitle={transaction.description}
-        >
-          <ListItem.Content>
-            <View style={styles.transaction}>
-              <View style={styles.transaction}>
-                <Image
-                  source={transaction.icon}
-                  style={{
-                    width: 40,
-                    height: 40,
-                    marginRight: 10,
-                    tintColor: transaction.color,
-                  }}
-                ></Image>
-              </View>
-              <View>
-                <Text
-                  style={{
-                    fontSize: 16,
-                    color: "#57606f",
-                    fontWeight: "bold",
-                  }}
-                >
-                  {transaction.title}
-                </Text>
-                <Text
-                  style={{
-                    fontSize: 12,
-                    color: "#a4b0be",
-                  }}
-                >
-                  {transaction.location}
-                </Text>
-              </View>
-            </View>
-          </ListItem.Content>
-          <ListItem color="black">
-            <ListItem.Subtitle style={styles.title}>
-              -${Math.abs(transaction.total)}
-            </ListItem.Subtitle>
-          </ListItem>
-        </ListItem>
-      ))} */}
-      </View>
       <ScrollView>
         {earliestTransactions.map((transaction, index) => (
           <ListItem
@@ -160,7 +111,6 @@ const RecentTransaction = ({ transactions, incomes }) => {
           </ListItem>
         ))}
       </ScrollView>
-      <Text>aa</Text>
     </View>
   );
 };

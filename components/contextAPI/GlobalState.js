@@ -170,26 +170,15 @@ const initialState = {
           date: "2023-11", //yyyy-mm
         },
       ],
-      income: [
-        {
-          id: 1,
-          title: "toys",
-          description: "toys",
-          location: "mall",
-          total: 10.0,
-          status: confirmStatus,
-          date: "2023-12-21",
-        },
-      ],
       expenses: [
         {
           id: 7,
           title: "Toys",
           description: "toys",
           location: "ByProgrammers' Toy Store",
-          total: 25.0,
+          total: 125.0,
           status: confirmStatus,
-          date: "2023-12-22",
+          date: "2024-01-22",
         },
         {
           id: 8,
@@ -226,12 +215,6 @@ const initialState = {
       icon: icons.healthcare,
       color: COLORS.peach,
       budget: [
-        {
-          id: 1,
-          total: 2000,
-          spent: 900,
-          date: "2024-01", //yyyy-mm
-        },
         {
           id: 2,
           total: 3000,
@@ -302,12 +285,6 @@ const initialState = {
       color: COLORS.purple,
       budget: [
         {
-          id: 1,
-          total: 2000,
-          spent: 900,
-          date: "2024-01", //yyyy-mm
-        },
-        {
           id: 2,
           total: 3000,
           spent: 800,
@@ -358,12 +335,6 @@ const initialState = {
       icon: icons.cloth_icon,
       color: COLORS.red,
       budget: [
-        {
-          id: 1,
-          total: 2000,
-          spent: 900,
-          date: "2024-01", //yyyy-mm
-        },
         {
           id: 2,
           total: 3000,
@@ -483,6 +454,15 @@ const initialState = {
       color: COLORS.lightgreen,
       income: [
         {
+          id: 1,
+          title: "Full Time Job",
+          description: "Full Time Job salary",
+          location: "company",
+          total: 1000.0,
+          status: confirmStatus,
+          date: "2024-01-21",
+        },
+        {
           id: 2,
           title: "Full Time Job",
           description: "Full Time Job salary",
@@ -509,6 +489,15 @@ const initialState = {
       color: COLORS.darkgreen,
       income: [
         {
+          id: 1,
+          title: "Full Time Job",
+          description: "Full Time Job salary",
+          location: "company",
+          total: 200.0,
+          status: confirmStatus,
+          date: "2024-01-21",
+        },
+        {
           id: 5,
           title: "bitcoin",
           description: "Vitamin",
@@ -534,6 +523,15 @@ const initialState = {
       icon: icons.salary,
       color: COLORS.lightgreen,
       income: [
+        {
+          id: 1,
+          title: "Full Time Job",
+          description: "Full Time Job salary",
+          location: "company",
+          total: 400.0,
+          status: confirmStatus,
+          date: "2024-01-21",
+        },
         {
           id: 2,
           title: "Full Time Job",

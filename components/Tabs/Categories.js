@@ -35,16 +35,144 @@ const Categories = () => {
     new Animated.Value(115)
   ).current;
   const { addTransaction, transactions, incomes } = useContext(GlobalContext);
+  const [currentPage, setCurrentPage] = useState(13);
 
   const [categories, setCategories] = React.useState(transactions);
   const [income, setIncome] = React.useState(incomeData);
   const [expenseIncome, setExpenseIncome] = React.useState("expense");
   const [viewMode, setViewMode] = React.useState("chart");
   const [selectedCategory, setSelectedCategory] = React.useState(null);
-
   const [showMoreToggle, setShowMoreToggle] = React.useState(false);
-  const [toggleCategoriesStyle, setToggleCategoriesStyle] = React.useState(true);
+  //Lấy từ BudgetController
+  const [todayIndex, setTodayIndex] = useState(12);
+  const [selectedMonth, setSelectedMonth] = useState(getCurrentMonth());
+  const [previousMonth1, setPreviousMonth] = React.useState(getPreviousMonth());
+
+  function getCurrentMonth() {
+    const currentDate = new Date();
+    const currentYear = currentDate.getFullYear();
+    const currentMonth = (currentDate.getMonth() + 1)
+      .toString()
+      .padStart(2, "0");
+    return `${currentYear}-${currentMonth}`;
+  }
+  console.log(selectedMonth, "selectedMonth");
+  const currentYear = new Date().getFullYear();
+  const monthsInRange = [];
+  for (let year = currentYear - 1; year <= currentYear; year++) {
+    for (let month = 1; month <= 12; month++) {
+      const formattedMonth = `${year}-${month.toString().padStart(2, "0")}`;
+      monthsInRange.push(formattedMonth);
+    }
+  }
+  console.log(monthsInRange, "monthsInRange");
+
+  const totalPages = Math.ceil(monthsInRange.length);
+
+  const nextPage = () => {
+    if (currentPage < totalPages) {
+      setTodayIndex(todayIndex + 1);
+      setSelectedMonth(monthsInRange[todayIndex + 1]);
+      setPreviousMonth(monthsInRange[todayIndex]);
+    }
+  };
+
+  const prevPage = () => {
+    if (currentPage > 1) {
+      setTodayIndex(todayIndex - 1);
+      setSelectedMonth(monthsInRange[todayIndex - 1]);
+      setPreviousMonth(monthsInRange[todayIndex - 2]);
+    }
+  };
+  function getCurrentMonth() {
+    const currentDate = new Date();
+    const currentYear = currentDate.getFullYear();
+    const currentMonth = (currentDate.getMonth() + 1)
+      .toString()
+      .padStart(2, "0");
+    return `${currentYear}-${currentMonth}`;
+  }
+  function getPreviousMonth() {
+    const currentDate = new Date();
+    let currentYear = currentDate.getFullYear();
+    let currentMonth = currentDate.getMonth();
+
+    // Trừ đi 1 để lấy tháng trước đó
+    currentMonth--;
+
+    // Nếu tháng hiện tại là tháng 1, cần trở về tháng 12 của năm trước
+    if (currentMonth === -1) {
+      currentMonth = 12;
+      currentYear--;
+    }
+
+    currentMonth = currentMonth.toString().padStart(2, "0");
+
+    return `${currentYear}-${currentMonth}`;
+  }
+  console.log(previousMonth1, 1);
+  let totalExpenseInMonth = [];
+  transactions.forEach((transaction) => {
+    let totalExpenseInMonth = {};
+    transaction.expenses.forEach((expense) => {
+      const [year, month] = expense.date.split("-");
+      const totalExpense = parseFloat(expense.total);
+      if (totalExpenseInMonth[year] && totalExpenseInMonth[year][month]) {
+        totalExpenseInMonth[year][month] += totalExpense;
+      } else {
+        if (!totalExpenseInMonth[year]) {
+          totalExpenseInMonth[year] = {};
+        }
+        totalExpenseInMonth[year][month] = totalExpense;
+      }
+    });
+
+    for (const year in totalExpenseInMonth) {
+      for (const month in totalExpenseInMonth[year]) {
+        const budget = transaction.budget.find(
+          (item) => item.date === `${year}-${month}`
+        );
+        if (budget) {
+          budget.spent = totalExpenseInMonth[year][month];
+        }
+      }
+    }
+  });
+  //Lấy từ BudgetController
+  const [toggleCategoriesStyle, setToggleCategoriesStyle] =
+    React.useState(true);
   function renderHeader() {
+    const currentMonthData = processIncomeDataToDisplay();
+    const previousMonthData = processIncomeDataToDisplayPreviousMonth();
+    const currentCategoryData = processCategoryDataToDisplay();
+    const previousCategoryData = processCategoryDataToDisplayPreviousMonth();
+    let currentMonthTotal = 0;
+    let previousMonthTotal = 0;
+    let currentCategoryTotal = 0;
+    let previousCategoryTotal = 0;
+    currentMonthData.forEach((item) => {
+      currentMonthTotal += item.y;
+    });
+
+    previousMonthData.forEach((item) => {
+      previousMonthTotal += item.y;
+    });
+    currentCategoryData.forEach((item) => {
+      currentCategoryTotal += item.y;
+    });
+    previousCategoryData.forEach((item) => {
+      previousCategoryTotal += item.y;
+    });
+    const difference = (
+      (currentMonthTotal / previousMonthTotal) * 100 -
+      100
+    ).toFixed(2);
+
+    const differenceCategory = (
+      (currentCategoryTotal / previousCategoryTotal) * 100 -
+      100
+    ).toFixed(2);
+
     return (
       <View
         style={{
@@ -74,7 +202,9 @@ const Categories = () => {
           >
             My Expenses
           </Text>
-          <Text style={{ ...FONTS.h3, color: COLORS.darkgray }}>Summary (private)</Text>
+          <Text style={{ ...FONTS.h3, color: COLORS.darkgray }}>
+            Summary (private)
+          </Text>
         </View>
 
         <View
@@ -102,8 +232,36 @@ const Categories = () => {
           </View>
 
           <View>
-            <Text style={{ color: COLORS.primary, ...FONTS.h3 }}>11 Nov, 2020</Text>
-            <Text style={{ ...FONTS.body3, color: COLORS.darkgray }}>18% more than last month</Text>
+            <Text style={{ color: COLORS.primary, ...FONTS.h3 }}>
+              {selectedMonth}
+            </Text>
+            {expenseIncome === "expense" ? (
+              differenceCategory > 0 ? (
+                <View>
+                  <Text style={{ ...FONTS.body3, color: COLORS.darkgray }}>
+                    {Math.abs(differenceCategory)}% more than last month
+                  </Text>
+                </View>
+              ) : (
+                <View>
+                  <Text style={{ ...FONTS.body3, color: COLORS.darkgray }}>
+                    {Math.abs(differenceCategory)}% less than last month
+                  </Text>
+                </View>
+              )
+            ) : difference > 0 ? (
+              <View>
+                <Text style={{ ...FONTS.body3, color: COLORS.darkgray }}>
+                  {Math.abs(difference)}% more than last month
+                </Text>
+              </View>
+            ) : (
+              <View>
+                <Text style={{ ...FONTS.body3, color: COLORS.darkgray }}>
+                  {Math.abs(difference)}% less than last month
+                </Text>
+              </View>
+            )}
           </View>
         </View>
       </View>
@@ -137,7 +295,9 @@ const Categories = () => {
             tintColor: item.color,
           }}
         />
-        <Text style={{ marginLeft: SIZES.base, color: COLORS.primary, ...FONTS.h4 }}>
+        <Text
+          style={{ marginLeft: SIZES.base, color: COLORS.primary, ...FONTS.h4 }}
+        >
           {item.name}
         </Text>
       </TouchableOpacity>
@@ -178,7 +338,9 @@ const Categories = () => {
             setShowMoreToggle(!showMoreToggle);
           }}
         >
-          <Text style={{ ...FONTS.body4 }}>{showMoreToggle ? "LESS" : "MORE"}</Text>
+          <Text style={{ ...FONTS.body4 }}>
+            {showMoreToggle ? "LESS" : "MORE"}
+          </Text>
           <Image
             source={showMoreToggle ? icons.up_arrow : icons.down_arrow}
             style={{
@@ -216,7 +378,9 @@ const Categories = () => {
             tintColor: item.color,
           }}
         />
-        <Text style={{ marginLeft: SIZES.base, color: COLORS.primary, ...FONTS.h4 }}>
+        <Text
+          style={{ marginLeft: SIZES.base, color: COLORS.primary, ...FONTS.h4 }}
+        >
           {item.name}
         </Text>
       </TouchableOpacity>
@@ -259,7 +423,9 @@ const Categories = () => {
         >
           {data.incomeCount > 4 ? (
             <>
-              <Text style={{ ...FONTS.body4 }}>{showMoreToggle ? "LESS" : "MORE"}</Text>
+              <Text style={{ ...FONTS.body4 }}>
+                {showMoreToggle ? "LESS" : "MORE"}
+              </Text>
 
               <Image
                 source={showMoreToggle ? icons.up_arrow : icons.down_arrow}
@@ -285,12 +451,19 @@ const Categories = () => {
           style={[
             expenseIncome === "expense"
               ? {
-                  backgroundColor: "purple",
+                  backgroundColor: "#7F3DFF",
                   padding: 7,
                   borderRadius: 12,
+                  marginRight: 10,
+                  marginTop: 10,
                   color: "white",
                 }
-              : { padding: 7, backgroundColor: "white", borderRadius: 12 },
+              : {
+                  padding: 7,
+                  backgroundColor: "white",
+                  borderRadius: 12,
+                  marginTop: 10,
+                },
           ]}
           onPress={() => setExpenseIncome("expense")}
         >
@@ -310,12 +483,20 @@ const Categories = () => {
           style={[
             expenseIncome === "income"
               ? {
-                  backgroundColor: "purple",
+                  backgroundColor: "#7F3DFF",
                   padding: 7,
                   borderRadius: 12,
                   color: "white",
+                  marginRight: 10,
+                  marginTop: 10,
+                  marginLeft: 10,
                 }
-              : { padding: 7, backgroundColor: "white", borderRadius: 12 },
+              : {
+                  padding: 7,
+                  backgroundColor: "white",
+                  borderRadius: 12,
+                  marginTop: 10,
+                },
           ]}
           onPress={() => setExpenseIncome("income")}
         >
@@ -347,7 +528,9 @@ const Categories = () => {
         {/* Title */}
         <View>
           <Text style={{ color: COLORS.primary, ...FONTS.h3 }}>CATEGORIES</Text>
-          <Text style={{ color: COLORS.darkgray, ...FONTS.body4 }}>{categories.length} Total</Text>
+          <Text style={{ color: COLORS.darkgray, ...FONTS.body4 }}>
+            {categories.length} Total
+          </Text>
         </View>
 
         {/* Button */}
@@ -413,7 +596,9 @@ const Categories = () => {
         {/* Title */}
         <View>
           <Text style={{ color: COLORS.primary, ...FONTS.h3 }}>CATEGORIES</Text>
-          <Text style={{ color: COLORS.darkgray, ...FONTS.body4 }}>{categories.length} Total</Text>
+          <Text style={{ color: COLORS.darkgray, ...FONTS.body4 }}>
+            {categories.length} Total
+          </Text>
         </View>
 
         {/* Button */}
@@ -467,74 +652,204 @@ const Categories = () => {
     );
   }
   function processIncomeDataToDisplay() {
-    let chartData = income.map((item) => {
-      let confirmIncome = item.income.filter((a) => a.status == "C");
-      var total = confirmIncome.reduce((a, b) => a + (b.total || 0), 0);
-      var totalIncome = confirmIncome.reduce((a, b) => a + (b.total || 0), 0);
+    let chartDataByMonth = incomes.map((item) => {
+      let dataByMoth = item.income.filter(
+        (a) => a.date.slice(0, 7) === selectedMonth
+      );
+      let dataByMonth = item.income.filter(
+        (a) => a.date.slice(0, 7) === selectedMonth
+      );
+      console.log(dataByMonth, "dataByMonth");
+
+      var total = dataByMonth.reduce((a, b) => a + (b.total || 0), 0);
+      console.log(selectedMonth, "selectedMonth");
+      var total = dataByMonth.reduce((a, b) => a + (b.total || 0), 0);
       return {
         name: item.name,
-        y: totalIncome,
-        incomeCount: confirmIncome.length,
+        y: total,
+        // expenseCount: confirmExpenses.length,
         color: item.color,
         id: item.id,
+        date: selectedMonth,
       };
     });
-    let filterChartData = chartData.filter((a) => a.y > 0);
+    console.log(chartDataByMonth, "IncomechartDataByMonth");
+    console.log(1, "incomechartDataByMonth");
+    let filterChartDataByMonth = chartDataByMonth.filter((a) => a.y > 0);
+    let totalExpenseByMonth = filterChartDataByMonth.reduce(
+      (a, b) => a + (b.y || 0),
+      0
+    );
 
-    // Calculate the total expenses
-    let totalIncome = filterChartData.reduce((a, b) => a + (b.y || 0), 0);
-
-    // Calculate percentage and repopulate chart data
-    let finalChartData = filterChartData.map((item) => {
-      let percentage = ((item.y / totalIncome) * 100).toFixed(0);
+    let finalChartDataByMonth = filterChartDataByMonth.map((item) => {
+      let percentage = ((item.y / totalExpenseByMonth) * 100).toFixed(0);
       return {
         label: `${percentage}%`,
         y: Number(item.y),
-        incomeCount: item.incomeCount,
+        // expenseCount: item.expenseCount,
         color: item.color,
         name: item.name,
         id: item.id,
       };
     });
+    return finalChartDataByMonth;
+  }
+  function processIncomeDataToDisplayPreviousMonth() {
+    let chartDataByMonth = incomes.map((item) => {
+      let dataByMoth = item.income.filter(
+        (a) => a.date.slice(0, 7) === previousMonth
+      );
+      let dataByMonth = item.income.filter(
+        (a) => a.date.slice(0, 7) === previousMonth
+      );
+      console.log(dataByMonth, "dataByMonth");
 
-    return finalChartData;
+      var total = dataByMonth.reduce((a, b) => a + (b.total || 0), 0);
+      console.log(previousMonth, "previousMonth");
+      var total = dataByMonth.reduce((a, b) => a + (b.total || 0), 0);
+      return {
+        name: item.name,
+        y: total,
+        // expenseCount: confirmExpenses.length,
+        color: item.color,
+        id: item.id,
+        date: previousMonth,
+      };
+    });
+    console.log(chartDataByMonth, "IncomechartDataByMonth");
+    console.log(1, "incomechartDataByMonth");
+    let filterChartDataByMonth = chartDataByMonth.filter((a) => a.y > 0);
+    let totalExpenseByMonth = filterChartDataByMonth.reduce(
+      (a, b) => a + (b.y || 0),
+      0
+    );
+
+    let finalChartDataByMonth = filterChartDataByMonth.map((item) => {
+      let percentage = ((item.y / totalExpenseByMonth) * 100).toFixed(0);
+      return {
+        label: `${percentage}%`,
+        y: Number(item.y),
+        // expenseCount: item.expenseCount,
+        color: item.color,
+        name: item.name,
+        id: item.id,
+      };
+    });
+    return finalChartDataByMonth;
   }
   function processCategoryDataToDisplay() {
     // Filter expenses with "Confirmed" status
     let chartData = categories.map((item) => {
       let confirmExpenses = item.expenses.filter((a) => a.status == "C");
       var total = confirmExpenses.reduce((a, b) => a + (b.total || 0), 0);
-      var totalExpenses = confirmExpenses.reduce((a, b) => a + (b.total || 0), 0);
+      var totalExpenses = confirmExpenses.reduce(
+        (a, b) => a + (b.total || 0),
+        0
+      );
       return {
         name: item.name,
         y: total,
         expenseCount: confirmExpenses.length,
         color: item.color,
         id: item.id,
+        date: item.date,
       };
     });
-
+    let chartDataByMonth = categories.map((item) => {
+      let dataByMoth = item.expenses.filter(
+        (a) => a.date.slice(0, 7) == selectedMonth
+      );
+      var total = dataByMoth.reduce((a, b) => a + (b.total || 0), 0);
+      return {
+        name: item.name,
+        y: total,
+        // expenseCount: confirmExpenses.length,
+        color: item.color,
+        id: item.id,
+        date: selectedMonth,
+      };
+    });
     // filter out categories with no data/expenses
+    let filterChartDataByMonth = chartDataByMonth.filter((a) => a.y > 0);
     let filterChartData = chartData.filter((a) => a.y > 0);
 
     // Calculate the total expenses
+    let totalExpenseByMonth = filterChartDataByMonth.reduce(
+      (a, b) => a + (b.y || 0),
+      0
+    );
     let totalExpense = filterChartData.reduce((a, b) => a + (b.y || 0), 0);
-
     // Calculate percentage and repopulate chart data
-    let finalChartData = filterChartData.map((item) => {
-      let percentage = ((item.y / totalExpense) * 100).toFixed(0);
+    let finalChartDataByMonth = filterChartDataByMonth.map((item) => {
+      let percentage = ((item.y / totalExpenseByMonth) * 100).toFixed(0);
       return {
         label: `${percentage}%`,
         y: Number(item.y),
-        expenseCount: item.expenseCount,
+        // expenseCount: item.expenseCount,
         color: item.color,
         name: item.name,
         id: item.id,
       };
     });
-
-    return finalChartData;
+    return finalChartDataByMonth;
   }
+  function processCategoryDataToDisplayPreviousMonth() {
+    // Filter expenses with "Confirmed" status
+    let chartData = categories.map((item) => {
+      let confirmExpenses = item.expenses.filter((a) => a.status == "C");
+      var total = confirmExpenses.reduce((a, b) => a + (b.total || 0), 0);
+      var totalExpenses = confirmExpenses.reduce(
+        (a, b) => a + (b.total || 0),
+        0
+      );
+      return {
+        name: item.name,
+        y: total,
+        expenseCount: confirmExpenses.length,
+        color: item.color,
+        id: item.id,
+        date: item.date,
+      };
+    });
+    let chartDataByMonth = categories.map((item) => {
+      let dataByMoth = item.expenses.filter(
+        (a) => a.date.slice(0, 7) == previousMonth
+      );
+      var total = dataByMoth.reduce((a, b) => a + (b.total || 0), 0);
+      return {
+        name: item.name,
+        y: total,
+        // expenseCount: confirmExpenses.length,
+        color: item.color,
+        id: item.id,
+        date: previousMonth,
+      };
+    });
+    // filter out categories with no data/expenses
+    let filterChartDataByMonth = chartDataByMonth.filter((a) => a.y > 0);
+    let filterChartData = chartData.filter((a) => a.y > 0);
+
+    // Calculate the total expenses
+    let totalExpenseByMonth = filterChartDataByMonth.reduce(
+      (a, b) => a + (b.y || 0),
+      0
+    );
+    let totalExpense = filterChartData.reduce((a, b) => a + (b.y || 0), 0);
+    // Calculate percentage and repopulate chart data
+    let finalChartDataByMonth = filterChartDataByMonth.map((item) => {
+      let percentage = ((item.y / totalExpenseByMonth) * 100).toFixed(0);
+      return {
+        label: `${percentage}%`,
+        y: Number(item.y),
+        // expenseCount: item.expenseCount,
+        color: item.color,
+        name: item.name,
+        id: item.id,
+      };
+    });
+    return finalChartDataByMonth;
+  }
+  console.log(processCategoryDataToDisplay(), "processCategoryDataToDisplay");
   function renderCategoryList() {
     const renderItem = ({ item }) => (
       <TouchableOpacity
@@ -558,7 +873,9 @@ const Categories = () => {
             tintColor: item.color,
           }}
         />
-        <Text style={{ marginLeft: SIZES.base, color: COLORS.primary, ...FONTS.h4 }}>
+        <Text
+          style={{ marginLeft: SIZES.base, color: COLORS.primary, ...FONTS.h4 }}
+        >
           {item.name}
         </Text>
       </TouchableOpacity>
@@ -599,7 +916,9 @@ const Categories = () => {
             setShowMoreToggle(!showMoreToggle);
           }}
         >
-          <Text style={{ ...FONTS.body4 }}>{showMoreToggle ? "LESS" : "MORE"}</Text>
+          <Text style={{ ...FONTS.body4 }}>
+            {showMoreToggle ? "LESS" : "MORE"}
+          </Text>
           <Image
             source={showMoreToggle ? icons.up_arrow : icons.down_arrow}
             style={{
@@ -616,7 +935,10 @@ const Categories = () => {
   function renderChart() {
     let chartData = processCategoryDataToDisplay();
     let colorScales = chartData.map((item) => item.color);
-    let totalExpenseCount = chartData.reduce((a, b) => a + (b.expenseCount || 0), 0);
+    let totalExpenseCount = chartData.reduce(
+      (a, b) => a + (b.expenseCount || 0),
+      0
+    );
     let totalExpense = chartData.reduce((a, b) => a + (b.y || 0), 0);
     console.log("Check Chart");
     console.log(chartData);
@@ -634,7 +956,9 @@ const Categories = () => {
             }
             padAngle={({ datum }) => datum.y}
             innerRadius={200}
-            labelRadius={({ innerRadius }) => (SIZES.width * 0.1 + innerRadius) / 2.5}
+            labelRadius={({ innerRadius }) =>
+              (SIZES.width * 0.1 + innerRadius) / 2.5
+            }
             style={{
               labels: { fill: "white" },
               parent: {
@@ -665,8 +989,12 @@ const Categories = () => {
           />
 
           <View style={{ position: "absolute", top: "42%", left: "42%" }}>
-            <Text style={{ ...FONTS.h1, textAlign: "center" }}>{totalExpenseCount}</Text>
-            <Text style={{ ...FONTS.body3, textAlign: "center" }}>Expenses</Text>
+            <Text style={{ ...FONTS.h1, textAlign: "center" }}>
+              {totalExpenseCount}
+            </Text>
+            <Text style={{ ...FONTS.body3, textAlign: "center" }}>
+              Expenses
+            </Text>
           </View>
         </View>
       );
@@ -680,7 +1008,9 @@ const Categories = () => {
               standalone={false}
               data={chartData}
               radius={({ datum }) =>
-                selectedCategory && selectedCategory.name == datum.name ? 600 * 0.4 : 600 * 0.4 - 10
+                selectedCategory && selectedCategory.name == datum.name
+                  ? 600 * 0.4
+                  : 600 * 0.4 - 10
               }
               innerRadius={100}
               labelRadius={({ innerRadius }) => (600 * 0.4 + innerRadius) / 2.5}
@@ -714,10 +1044,19 @@ const Categories = () => {
             />
           </Svg>
           <View
-            style={{ position: "absolute", top: "42%", left: "37%", transform: [{ scale: 0.8 }] }}
+            style={{
+              position: "absolute",
+              top: "42%",
+              left: "37%",
+              transform: [{ scale: 0.8 }],
+            }}
           >
-            <Text style={{ ...FONTS.body3, textAlign: "center" }}>Total Expended Amount</Text>
-            <Text style={{ ...FONTS.h1, textAlign: "center" }}>{totalExpense} $</Text>
+            <Text style={{ ...FONTS.body3, textAlign: "center" }}>
+              Total Expended Amount
+            </Text>
+            <Text style={{ ...FONTS.h1, textAlign: "center" }}>
+              {totalExpense} $
+            </Text>
           </View>
         </View>
       );
@@ -725,8 +1064,13 @@ const Categories = () => {
   }
   function renderIncomeChart() {
     let chartData = processIncomeDataToDisplay();
+    console.log(processIncomeDataToDisplay(), "asd");
+
     let colorScales = chartData.map((item) => item.color);
-    let totalIncomeCount = chartData.reduce((a, b) => a + (b.expenseCount || 0), 0);
+    let totalIncomeCount = chartData.reduce(
+      (a, b) => a + (b.expenseCount || 0),
+      0
+    );
     let totalIncome = chartData.reduce((a, b) => a + (b.y || 0), 0);
     console.log("Check Chart");
     console.log(chartData);
@@ -744,7 +1088,9 @@ const Categories = () => {
             }
             padAngle={({ datum }) => datum.y}
             innerRadius={200}
-            labelRadius={({ innerRadius }) => (SIZES.width * 0.1 + innerRadius) / 2.5}
+            labelRadius={({ innerRadius }) =>
+              (SIZES.width * 0.1 + innerRadius) / 2.5
+            }
             style={{
               labels: { fill: "white" },
               parent: {
@@ -775,8 +1121,12 @@ const Categories = () => {
           />
 
           <View style={{ position: "absolute", top: "42%", left: "42%" }}>
-            <Text style={{ ...FONTS.h1, textAlign: "center" }}>{totalIncomeCount}</Text>
-            <Text style={{ ...FONTS.body3, textAlign: "center" }}>Expenses</Text>
+            <Text style={{ ...FONTS.h1, textAlign: "center" }}>
+              {totalIncomeCount}
+            </Text>
+            <Text style={{ ...FONTS.body3, textAlign: "center" }}>
+              Expenses
+            </Text>
           </View>
         </View>
       );
@@ -790,7 +1140,9 @@ const Categories = () => {
               standalone={false}
               data={chartData}
               radius={({ datum }) =>
-                selectedCategory && selectedCategory.name == datum.name ? 600 * 0.4 : 600 * 0.4 - 10
+                selectedCategory && selectedCategory.name == datum.name
+                  ? 600 * 0.4
+                  : 600 * 0.4 - 10
               }
               innerRadius={100}
               labelRadius={({ innerRadius }) => (600 * 0.4 + innerRadius) / 2.5}
@@ -824,8 +1176,12 @@ const Categories = () => {
             />
           </Svg>
           <View style={{ position: "absolute", top: "42%", left: "37%" }}>
-            <Text style={{ ...FONTS.body3, textAlign: "center" }}>Total Income Amount</Text>
-            <Text style={{ ...FONTS.h1, textAlign: "center" }}>{totalIncome} $</Text>
+            <Text style={{ ...FONTS.body3, textAlign: "center" }}>
+              Total Income Amount
+            </Text>
+            <Text style={{ ...FONTS.h1, textAlign: "center" }}>
+              {totalIncome} $
+            </Text>
           </View>
         </View>
       );
@@ -842,7 +1198,9 @@ const Categories = () => {
           paddingHorizontal: SIZES.radius,
           borderRadius: 10,
           backgroundColor:
-            selectedCategory && selectedCategory.name == item.name ? item.color : COLORS.white,
+            selectedCategory && selectedCategory.name == item.name
+              ? item.color
+              : COLORS.white,
         }}
         onPress={() => {
           let categoryName = item.name;
@@ -856,7 +1214,9 @@ const Categories = () => {
               width: 20,
               height: 20,
               backgroundColor:
-                selectedCategory && selectedCategory.name == item.name ? COLORS.white : item.color,
+                selectedCategory && selectedCategory.name == item.name
+                  ? COLORS.white
+                  : item.color,
               borderRadius: 5,
             }}
           />
@@ -914,7 +1274,9 @@ const Categories = () => {
           paddingHorizontal: SIZES.radius,
           borderRadius: 10,
           backgroundColor:
-            selectedCategory && selectedCategory.name == item.name ? item.color : COLORS.white,
+            selectedCategory && selectedCategory.name == item.name
+              ? item.color
+              : COLORS.white,
         }}
         onPress={() => {
           let categoryName = item.name;
@@ -928,7 +1290,9 @@ const Categories = () => {
               width: 20,
               height: 20,
               backgroundColor:
-                selectedCategory && selectedCategory.name == item.name ? COLORS.white : item.color,
+                selectedCategory && selectedCategory.name == item.name
+                  ? COLORS.white
+                  : item.color,
               borderRadius: 5,
             }}
           />
@@ -975,10 +1339,59 @@ const Categories = () => {
       </View>
     );
   }
+  const previousMonthIndex = todayIndex - 1;
+  const previousMonth = monthsInRange[previousMonthIndex];
+  // function compareTotalY(currentMonthData, previousMonthData) {
+  //   let currentMonthTotal = 0;
+  //   let previousMonthTotal = 0;
+  //   console.log("compareTotalY");
+  //   currentMonthData.forEach((item) => {
+  //     currentMonthTotal += item.y;
+  //   });
+
+  //   previousMonthData.forEach((item) => {
+  //     previousMonthTotal += item.y;
+  //   });
+
+  //   // So sánh tổng giá trị hoặc tính phần trăm thay đổi tùy theo nhu cầu của bạn
+  //   const difference = (currentMonthTotal / previousMonthTotal) * 100 - 100;
+  //   console.log("Tổng giá trị tháng hiện tại:", currentMonthTotal);
+  //   console.log("Tổng giá trị tháng trước:", previousMonthTotal);
+  //   console.log("Sự khác biệt:", difference);
+  // }
+  // console.log(
+  //   // processIncomeDataToDisplay(selectedMonth),
+  //   // processIncomeDataToDisplay(previousMonth),
+  //   compareTotalY(
+  //     processIncomeDataToDisplay(selectedMonth),
+  //     processIncomeDataToDisplay(previousMonth)
+  //   ),
+  //   "compare"
+  // );
   return (
     <ScrollView contentContainerStyle={styles.container}>
       {renderHeader()}
       {renderExpenseIncomeSection()}
+      <View
+        style={{
+          flexDirection: "row",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <TouchableOpacity onPress={prevPage} disabled={currentPage === 1}>
+          <Text style={{ fontSize: 30, marginRight: 10 }}>&#8249;</Text>
+        </TouchableOpacity>
+        <Text style={{ marginHorizontal: 10, marginTop: 5 }}>
+          {selectedMonth}
+        </Text>
+        <TouchableOpacity
+          onPress={nextPage}
+          disabled={currentPage === totalPages}
+        >
+          <Text style={{ fontSize: 30, marginLeft: 10 }}>&#8250;</Text>
+        </TouchableOpacity>
+      </View>
       {expenseIncome == "expense" && (
         <View>
           {renderChart()}

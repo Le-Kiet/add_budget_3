@@ -1,4 +1,11 @@
-import { View, Text, TouchableOpacity, StyleSheet, Image, Button } from "react-native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  Image,
+  Button,
+} from "react-native";
 import * as React from "react";
 import StatusCard from "../StatusCard/Card";
 import { useNavigation } from "@react-navigation/native";
@@ -9,8 +16,7 @@ import { GlobalContext } from "../contextAPI/GlobalState";
 import LineChartComponent from "../LineChartComponent";
 import Chart from "../Chart";
 import History from "./History";
-// import { LinearGradient, Stop } from "react-native-svg";
-// import { LineChart, AreaChart, Grid } from "react-native-gifted-charts";
+
 const HomePage = () => {
   const navigation = useNavigation();
   const handleClick = () => {
@@ -41,15 +47,7 @@ const HomePage = () => {
   const handleOpenTransaction = () => {
     setOpenTransaction(!openTransaction);
   };
-  const dv = [
-    { value: 170 },
-    { value: 220 },
-    { value: 170 },
-    { value: 196 },
-    { value: 176 },
-    { value: 141 },
-    { value: 172 },
-  ];
+
   const educationExpenses = transactions.find(
     (transaction) => transaction.name === "Education"
   ).expenses;
@@ -69,66 +67,50 @@ const HomePage = () => {
     <View
       style={{
         flex: 1,
-
-        justifyContent: "center",
         alignItems: "center",
         backgroundColor: "#F8EFFF",
-
-        //backgroundColor: "white",
       }}
     >
-      {/* <AreaChart
-        data={[10, 20, 30, 40, 50]} // Dữ liệu cho biểu đồ
-        strokeColor="#297AB1" // Màu đường kẻ
-        fillColor="rgba(41, 122, 177, 0.3)" // Màu vùng bên dưới đường kẻ
-        strokeWidth={2} // Độ dày đường kẻ
-        fillGradient={["#297AB1", "#FFFFFF"]} // Gradient cho vùng bên dưới đường kẻ
-        style={{ height: 200 }} // Kích thước biểu đồ
-      >
-        <Grid /> // Hiển thị lưới
-      </AreaChart> */}
-      <TouchableOpacity onPress={handleOpenTransaction}>
-        <Text>New Transaction</Text>
-      </TouchableOpacity>
-      {openTransaction === true && (
-        <View
-          style={{
-            flex: 1,
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        >
-          <TouchableOpacity onPress={handleOpenTransaction}>
-            <Text>Close Transaction</Text>
-          </TouchableOpacity>
-          <View style={styles.buttonContainer}>
-            <Button
-              buttonStyle={[styles.button, styles.cashOutButton]}
-              title="- CASH OUT"
-              onPress={handleClickAddExpense}
-            />
-            <Button
-              buttonStyle={[styles.button, styles.cashInButton]}
-              title="+ CASH IN"
-              onPress={handleClickAddIncome}
-            />
-          </View>
-        </View>
-      )}
       {/* <TransactionForm /> */}
-
-      <View style={{ marginTop: 400 }}></View>
-      {/* <LineChartComponent data={transactions} width={300} height={300} /> */}
+      <View
+        style={{
+          marginTop: 10,
+        }}
+      ></View>
       <LineChartComponent />
-      {/* <Chart /> */}
+
       <StatusCard />
       <View style={{ marginTop: 10 }}>{renderHeaderRecentTransactions()}</View>
       <RecentTransaction transactions={transactions} incomes={incomes} />
-
       {/* <History /> */}
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity
+          style={{
+            backgroundColor: "#6ab04c",
+            marginRight: 5,
+            padding: 10,
+            borderRadius: 16,
+          }}
+          // style={[styles.button, styles.cashInButton]}
+          onPress={handleClickAddIncome}
+        >
+          <Text style={[styles.textWhite, styles.textBold]}>+ CASH IN</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={{
+            backgroundColor: "#eb4d4b",
+            marginRight: 5,
+            padding: 10,
+            borderRadius: 16,
+          }}
+          // style={[styles.button, styles.cashOutButton]}
+          onPress={handleClickAddExpense}
+        >
+          <Text style={[styles.textWhite, styles.textBold]}>- CASH OUT</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
-  //20521495_LeDinhTuanKiet
 };
 const styles = StyleSheet.create({
   buttonContainer: {
@@ -147,12 +129,11 @@ const styles = StyleSheet.create({
   recentTrans: {
     marginTop: 150,
   },
+  // button: {
+  //   width: 150,
+  //   borderRadius: 30,
+  // },
   button: {
-    width: 150,
-    borderRadius: 30,
-  },
-  button: {
-    backgroundColor: "blue",
     padding: 10,
     marginTop: 5,
     borderRadius: 5,

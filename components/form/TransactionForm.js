@@ -355,16 +355,20 @@ const TransactionForm = ({ navigation }) => {
       )}
       <View style={{ marginTop: 100 }}></View>
       <View style={styles.buttonContainer}>
-        <Button
-          buttonStyle={[styles.button, styles.cashOutButton]}
-          title="- CASH OUT"
-          onPress={() => onWithdraw()}
-        />
-        <Button
-          buttonStyle={[styles.button, styles.cashInButton]}
-          title="+ CASH IN"
-          onPress={() => onSubmit()}
-        />
+        {addExpense === true && (
+          <Button
+            buttonStyle={[styles.button, styles.cashOutButton]}
+            title="- CASH OUT"
+            onPress={() => onSubmit()}
+          />
+        )}
+        {addIncome === true && (
+          <Button
+            buttonStyle={[styles.button, styles.cashInButton]}
+            title="+ CASH IN"
+            onPress={() => onWithdraw()}
+          />
+        )}
       </View>
     </View>
   );
