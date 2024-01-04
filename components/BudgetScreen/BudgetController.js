@@ -1,13 +1,5 @@
 import React, { useState, useContext } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  TextInput,
-  TouchableOpacity,
-  Alert,
-  Image,
-} from "react-native";
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert, Image } from "react-native";
 import Slider from "@react-native-community/slider";
 import AddBudget from "../BudgetScreen/AddBudget";
 import ProgressBar from "react-native-progress-bar-animated";
@@ -59,22 +51,17 @@ const Favorites = ({ navigation }) => {
   };
 
   const onSaveBudget = () => {
-    console.log(
-      "Lưu thành công",
-      `Ngân sách hiện tại: ${budget}$, Mục tiêu tài chính: ${goal}$`
-    );
+    console.log("Lưu thành công", `Ngân sách hiện tại: ${budget}$, Mục tiêu tài chính: ${goal}$`);
     Alert.alert("Saved");
   };
 
   return (
     <View style={styles.container}>
-      <Text style={{ color: "white" }}>Current Month</Text>
+      <Text style={{ color: "#7F3DFF", fontWeight: "bold" }}>Current Month</Text>
       {budgetCounter == 0 ? (
         <View>
           <Text style={styles.noBudgetText}>You dont have budget.</Text>
-          <Text style={styles.noBudgetText}>
-            Let's make one so you in control
-          </Text>
+          <Text style={styles.noBudgetText}>Let's make one so you in control</Text>
         </View>
       ) : (
         <View style={styles.budgetContainer}>
@@ -89,33 +76,30 @@ const Favorites = ({ navigation }) => {
                   borderWidth: 1,
                   borderRadius: 32,
                   borderColor: "#91919F",
-                  padding: 3,
+                  width: 109,
+                  height: 40,
                 }}
               >
                 <Svg width="14" height="14" style={{ margin: 3 }}>
                   <Circle cx="7" cy="7" r="7" fill="red" />
                 </Svg>
-                <Text style={{ marginTop: -3 }}>aaaaaaaaaaaa</Text>
+                <Text style={{ marginTop: -3, padding: 10 }}>Shopping</Text>
               </View>
               <View>
                 <Image
                   source={require("../../assets/warning.png")}
-                  style={{ height: 28, width: 28 }}
+                  style={{ height: 28, width: 28, marginLeft: 150 }}
                 ></Image>
               </View>
             </View>
             <View>
-              <Text style={{ fontSize: 22, fontWeight: "bold" }}>
-                Remaining $0
-              </Text>
+              <Text style={{ fontSize: 22, fontWeight: "bold" }}>Remaining $0</Text>
               <ProgressBar
                 width={200}
                 value={progress}
                 backgroundColor={backgroundColorOnComplete}
               />
-              <Text style={{ fontSize: 14, color: backgroundColorOnComplete }}>
-                1000$ of 1200$
-              </Text>
+              <Text style={{ fontSize: 14, color: backgroundColorOnComplete }}>1000$ of 1200$</Text>
             </View>
           </View>
         </View>
@@ -181,8 +165,20 @@ const Favorites = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
+
     alignItems: "center",
+    justifyContent: "flex-start",
+  },
+  budgetContainer: {
+    //flex: 1,
+
+    alignItems: "flex-start",
+    justifyContent: "flex-start",
+    backgroundColor: "#fff",
+    padding: 16,
+    borderRadius: 16,
+
+    height: 200,
   },
   title: {
     fontSize: 20,
@@ -240,7 +236,10 @@ const styles = StyleSheet.create({
   budgetHeader: {
     flex: 1,
     flexDirection: "row",
+    alignItems: "center",
     justifyContent: "space-between",
+    width: 300,
+    height: 1,
   },
 });
 

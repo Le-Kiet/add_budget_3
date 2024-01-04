@@ -1,41 +1,62 @@
-import { View, Text, StyleSheet, TextInput } from "react-native";
 import React, { useState } from "react";
-import Slider from "@react-native-community/slider";
-import { TouchableOpacity } from "react-native-gesture-handler";
-import { GlobalContext } from "../contextAPI/GlobalState";
-const AddBudget = ({ navigation }) => {
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert } from "react-native";
+
+const AddBudget = () => {
   const [budget, setBudget] = useState(0);
-  const addBudget = () => {
-    navigation.navigate();
-  };
+  const [goal, setGoal] = useState(0);
+  const [debt, setDebt] = useState(0);
+  const [financialBalance, setFinancialBalance] = useState(budget - debt);
   const onBudgetChange = (value) => {
     setBudget(value);
+    updateFinancialBalance(value, debt);
+  };
+  const onGoalChange = (value) => {
+    setGoal(value);
   };
 
-  const onInputChange = (text) => {
-    const numericValue = parseInt(text, 10);
-    setBudget(numericValue);
+  const onDebtChange = (value) => {
+    setDebt(value);
+    updateFinancialBalance(budget, value);
+  };
+  const updateFinancialBalance = (budgetValue, debtValue) => {
+    const balance = budgetValue - debtValue;
+    setFinancialBalance(balance);
+  };
+
+  const onSaveBudget = () => {
+    console.log("Lưu thành công", `Ngân sách hiện tại: ${budget}$, Mục tiêu tài chính: ${goal}$`);
+    Alert.alert("Saved");
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Budget Planner</Text>
-      <Text style={styles.title}>Your Balanced: 2000$</Text>
-      <Text style={styles.budgetText}>Current Budget: {budget}$</Text>
-      <Slider
-        style={styles.slider}
-        minimumValue={0}
-        maximumValue={2000}
-        step={100}
-        value={budget}
-        onValueChange={onBudgetChange}
-      />
+      <Text style={styles.title}>Add Budget</Text>
+      <Text style={styles.label}>Current budget:</Text>
       <TextInput
         style={styles.input}
         keyboardType="numeric"
         value={budget.toString()}
-        onChangeText={onInputChange}
+        onChangeText={onBudgetChange}
       />
+      <Text style={styles.label}>Goal: </Text>
+      <TextInput
+        style={styles.input}
+        keyboardType="numeric"
+        value={goal.toString()}
+        onChangeText={onGoalChange}
+      />
+      <Text style={styles.label}>Debt: </Text>
+      <TextInput
+        style={styles.input}
+        keyboardType="numeric"
+        value={debt.toString()}
+        onChangeText={onDebtChange}
+      />
+      <Text style={styles.label}>Current Balanced: </Text>
+      <Text>{financialBalance}$</Text>
+      <TouchableOpacity style={styles.buttonSave} onPress={onSaveBudget}>
+        <Text style={styles.text}>Save</Text>
+      </TouchableOpacity>
     </View>
   );
 };
@@ -48,19 +69,37 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 20,
     marginBottom: 10,
+    fontWeight: "bold",
+    color: "#7F3DFF",
+    alignSelf: "center",
   },
-  budgetText: {
+  label: {
     fontSize: 18,
-  },
-  slider: {
-    marginTop: 20,
+    marginTop: 10,
+    marginBottom: 5,
   },
   input: {
     height: 40,
     borderColor: "gray",
     borderWidth: 1,
-    marginTop: 10,
+    marginTop: 5,
     paddingHorizontal: 10,
+  },
+  buttonSave: {
+    marginTop: 40,
+    alignItems: "center",
+    alignSelf: "center",
+    paddingVertical: 10,
+    paddingHorizontal: 50,
+    borderRadius: 10,
+    color: "#7F3DFF",
+    backgroundColor: "#7F3DFF",
+  },
+  text: {
+    fontSize: 15,
+    fontWeight: "bold",
+    textAlign: "center",
+    color: "#fff",
   },
 });
 
