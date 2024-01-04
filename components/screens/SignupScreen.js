@@ -101,7 +101,6 @@ const SignUpScreen = () => {
         onChangeText={(text) => setUsername(text)}
         value={username}
       />
-      dd
       <TextInput
         placeholder="Email"
         style={styles.TextInput}
@@ -150,9 +149,9 @@ const SignUpScreen = () => {
       <TouchableOpacity style={styles.button} onPress={signUp}>
         <Text style={styles.buttonText}>Sign Up FireBase</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.button} onPress={handleSignUp}>
+      {/* <TouchableOpacity style={styles.button} onPress={handleSignUp}>
         <Text style={styles.buttonText}>Sign Up</Text>
-      </TouchableOpacity>
+      </TouchableOpacity> */}
       <TouchableOpacity>
         <Text style={styles.Text} onPress={handleLogin}>
           Already have an account? Login

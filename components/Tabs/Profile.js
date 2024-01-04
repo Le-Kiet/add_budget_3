@@ -55,17 +55,13 @@ const Profile = ({ navigation }) => {
           <Ionicons name="arrow-forward" size={20} color="#0D0E0F" />
         </TouchableOpacity>
       </View>
-      <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+      <TouchableOpacity
+        style={styles.logoutButton}
+        onPress={() => FIREBASE_AUTH.signOut()}
+      >
         <Ionicons name="log-out-outline" size={20} color="#fff" />
         <Text style={[styles.buttonTextOut, { marginLeft: 8 }]}>Log out</Text>
       </TouchableOpacity>
-      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-        <Text>Profile Screen</Text>
-        <Button
-          title="Log out"
-          onPress={() => FIREBASE_AUTH.signOut()}
-        ></Button>
-      </View>
     </View>
   );
 };

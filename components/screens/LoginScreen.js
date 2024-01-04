@@ -33,7 +33,7 @@ const LoginScreen = () => {
     try {
       const response = await signInWithEmailAndPassword(auth, email, password);
       console.log(response);
-      alert("check your emails");
+      alert("Đăng nhập thành công!");
     } catch (error) {
       console.log(error);
       alert("login failed:" + error.message);
@@ -78,9 +78,9 @@ const LoginScreen = () => {
         <Text style={styles.buttonText}>Login</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.button} onPress={signUp}>
+      {/* <TouchableOpacity style={styles.button} onPress={signUp}>
         <Text style={styles.buttonText}>SignUp</Text>
-      </TouchableOpacity>
+      </TouchableOpacity> */}
       <TouchableOpacity>
         <Text style={styles.Text}> Forgot the Password?</Text>
       </TouchableOpacity>
