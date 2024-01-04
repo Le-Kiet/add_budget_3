@@ -17,7 +17,7 @@ const Favorites = () => {
   return (
     <Stack.Navigator initialRouteName="BudgetController">
       <Stack.Screen
-        name="BudgetController"
+        name="Budget Controller"
         component={BudgetController}
         options={{ title: "Budget Controller", headerShown: false }}
       />

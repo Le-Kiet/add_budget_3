@@ -11,13 +11,33 @@ const initialState = {
       name: "Education",
       icon: icons.education,
       color: COLORS.yellow,
+      budget: [
+        {
+          id: 1,
+          total: 300,
+          spent: 100,
+          date: "2024-01", //yyyy-mm
+        },
+        {
+          id: 2,
+          total: 300,
+          spent: 75,
+          date: "2023-12", //yyyy-mm
+        },
+        {
+          id: 3,
+          total: 400,
+          spent: 350,
+          date: "2023-11", //yyyy-mm
+        },
+      ],
       expenses: [
         {
           id: 1,
           title: "Tuition Fee",
           description: "Tuition fee",
           location: "ByProgrammers' tuition center",
-          total: 100.0,
+          total: 350.0,
           status: confirmStatus,
           date: "2023-11-21",
         },
@@ -44,9 +64,9 @@ const initialState = {
           title: "PHP Books",
           description: "PHP books",
           location: "ByProgrammers' Book Store",
-          total: 20.0,
+          total: 200,
           status: confirmStatus,
-          date: "2023-10-21",
+          date: "2024-01-01",
         },
       ],
     },
@@ -55,6 +75,26 @@ const initialState = {
       name: "Nutrition",
       icon: icons.food,
       color: COLORS.lightBlue,
+      budget: [
+        {
+          id: 1,
+          total: 2000,
+          spent: 900,
+          date: "2024-01", //yyyy-mm
+        },
+        {
+          id: 2,
+          total: 3000,
+          spent: 800,
+          date: "2023-12", //yyyy-mm
+        },
+        {
+          id: 2,
+          total: 1200,
+          spent: 400,
+          date: "2023-11", //yyyy-mm
+        },
+      ],
       income: [
         {
           id: 1,
@@ -68,6 +108,24 @@ const initialState = {
       ],
       expenses: [
         {
+          id: 3,
+          title: "Vitamins",
+          description: "Vitamin",
+          location: "ByProgrammers' Pharmacy",
+          total: 250,
+          status: confirmStatus,
+          date: "2023-11-21",
+        },
+        {
+          id: 4,
+          title: "Vitamins",
+          description: "Vitamin",
+          location: "ByProgrammers' Pharmacy",
+          total: 100,
+          status: confirmStatus,
+          date: "2024-01-01",
+        },
+        {
           id: 5,
           title: "Vitamins",
           description: "Vitamin",
@@ -76,7 +134,6 @@ const initialState = {
           status: confirmStatus,
           date: "2023-12-21",
         },
-
         {
           id: 6,
           title: "Protein powder",
@@ -93,15 +150,24 @@ const initialState = {
       name: "Child",
       icon: icons.baby_car,
       color: COLORS.darkgreen,
-      income: [
+      budget: [
         {
           id: 1,
-          title: "toys",
-          description: "toys",
-          location: "mall",
-          total: 10.0,
-          status: confirmStatus,
-          date: "2023-12-21",
+          total: 2000,
+          spent: 900,
+          date: "2024-01", //yyyy-mm
+        },
+        {
+          id: 2,
+          total: 3000,
+          spent: 800,
+          date: "2023-12", //yyyy-mm
+        },
+        {
+          id: 2,
+          total: 1200,
+          spent: 400,
+          date: "2023-11", //yyyy-mm
         },
       ],
       expenses: [
@@ -109,16 +175,16 @@ const initialState = {
           id: 7,
           title: "Toys",
           description: "toys",
-          location: "ByProgrammers' Toy Store",
-          total: 25.0,
+          location: "ByProgrammers' Toy Storeb",
+          total: 125.0,
           status: confirmStatus,
-          date: "2023-12-22",
+          date: "2024-01-04",
         },
         {
           id: 8,
           title: "Baby Car Seat",
           description: "Baby Car Seat",
-          location: "ByProgrammers' Baby Care Store",
+          location: "ByProgrammers' Baby Care Storae",
           total: 100.0,
           status: confirmStatus,
           date: "2023-12-20",
@@ -127,7 +193,7 @@ const initialState = {
           id: 9,
           title: "Pampers",
           description: "Pampers",
-          location: "ByProgrammers' Supermarket",
+          location: "ByProgrammers' Supermarkect",
           total: 100.0,
           status: confirmStatus,
           date: "2023-12-19",
@@ -136,7 +202,7 @@ const initialState = {
           id: 10,
           title: "Baby T-Shirt",
           description: "T-Shirt",
-          location: "ByProgrammers' Fashion Store",
+          location: "ByProgrammers' Fashion Stodre",
           total: 20.0,
           status: confirmStatus,
           date: "2023-12-21",
@@ -148,6 +214,20 @@ const initialState = {
       name: "Beauty & Care",
       icon: icons.healthcare,
       color: COLORS.peach,
+      budget: [
+        {
+          id: 2,
+          total: 3000,
+          spent: 800,
+          date: "2023-12", //yyyy-mm
+        },
+        {
+          id: 2,
+          total: 1200,
+          spent: 400,
+          date: "2023-11", //yyyy-mm
+        },
+      ],
       income: [
         {
           id: 1,
@@ -164,7 +244,7 @@ const initialState = {
           id: 11,
           title: "Skin Care product",
           description: "skin care",
-          location: "ByProgrammers' Pharmacy",
+          location: "ByProgrammeres' Pharmacy",
           total: 10.0,
           status: confirmStatus,
           date: "2023-12-18",
@@ -173,7 +253,7 @@ const initialState = {
           id: 12,
           title: "Lotion",
           description: "Lotion",
-          location: "ByProgrammers' Pharmacy",
+          location: "ByProgrammerfs' Pharmacy",
           total: 50.0,
           status: confirmStatus,
           date: "2023-12-20",
@@ -182,7 +262,7 @@ const initialState = {
           id: 13,
           title: "Face Mask",
           description: "Face Mask",
-          location: "ByProgrammers' Pharmacy",
+          location: "ByProgrammerqs' Pharmacy",
           total: 50.0,
           status: confirmStatus,
           date: "2023-12-22",
@@ -191,7 +271,7 @@ const initialState = {
           id: 14,
           title: "Sunscreen cream",
           description: "Sunscreen cream",
-          location: "ByProgrammers' Pharmacy",
+          location: "ByProgrammesrs' Pharmacy",
           total: 50.0,
           status: confirmStatus,
           date: "2023-12-22",
@@ -203,6 +283,20 @@ const initialState = {
       name: "Sports",
       icon: icons.sports_icon,
       color: COLORS.purple,
+      budget: [
+        {
+          id: 2,
+          total: 3000,
+          spent: 800,
+          date: "2023-12", //yyyy-mm
+        },
+        {
+          id: 2,
+          total: 1200,
+          spent: 400,
+          date: "2023-11", //yyyy-mm
+        },
+      ],
       income: [
         {
           id: 1,
@@ -228,7 +322,7 @@ const initialState = {
           id: 16,
           title: "Gloves",
           description: "Gym Equipment",
-          location: "ByProgrammers' Gym",
+          location: "ByProgramzmers' Gym",
           total: 15.0,
           status: confirmStatus,
           date: "2023-12-23",
@@ -240,12 +334,26 @@ const initialState = {
       name: "Clothing",
       icon: icons.cloth_icon,
       color: COLORS.red,
+      budget: [
+        {
+          id: 2,
+          total: 3000,
+          spent: 800,
+          date: "2023-12", //yyyy-mm
+        },
+        {
+          id: 2,
+          total: 1200,
+          spent: 400,
+          date: "2023-11", //yyyy-mm
+        },
+      ],
       income: [
         {
           id: 1,
           title: "pant",
           description: "3 pant",
-          location: "clothes store",
+          location: "clothces store",
           total: 40.0,
           status: confirmStatus,
           date: "2023-12-21",
@@ -256,16 +364,16 @@ const initialState = {
           id: 17,
           title: "T-Shirt",
           description: "Plain Color T-Shirt",
-          location: "ByProgrammers' Mall",
+          location: "ByProgrammercs' Mall",
           total: 20.0,
           status: confirmStatus,
-          date: "2023-12-18",
+          date: "2023-11-18",
         },
         {
           id: 18,
           title: "Jeans",
           description: "Blue Jeans",
-          location: "ByProgrammers' Mall",
+          location: "ByProgrammaders' Mall",
           total: 50.0,
           status: confirmStatus,
           date: "2023-12-02",
@@ -277,6 +385,7 @@ const initialState = {
       name: "Holiday",
       icon: icons.holiday,
       color: COLORS.pink,
+      budget: [],
       income: [
         {
           id: 1,
@@ -314,6 +423,7 @@ const initialState = {
       name: "House",
       icon: icons.house,
       color: COLORS.blue,
+      budget: [],
       expenses: [
         {
           id: 17,
@@ -344,6 +454,15 @@ const initialState = {
       color: COLORS.lightgreen,
       income: [
         {
+          id: 1,
+          title: "Full Time Job",
+          description: "Fully Time Job salary",
+          location: "company",
+          total: 1000.0,
+          status: confirmStatus,
+          date: "2024-01-21",
+        },
+        {
           id: 2,
           title: "Full Time Job",
           description: "Full Time Job salary",
@@ -355,7 +474,7 @@ const initialState = {
         {
           id: 3,
           title: "Full Time Job",
-          description: "Full Time Job salary",
+          description: "part Time Job salary",
           location: "company",
           total: 1000.0,
           status: confirmStatus,
@@ -369,6 +488,15 @@ const initialState = {
       icon: icons.stock,
       color: COLORS.darkgreen,
       income: [
+        {
+          id: 1,
+          title: "Full Time Job",
+          description: "a Time Job salary",
+          location: "company",
+          total: 200.0,
+          status: confirmStatus,
+          date: "2024-01-21",
+        },
         {
           id: 5,
           title: "bitcoin",
@@ -395,6 +523,15 @@ const initialState = {
       icon: icons.salary,
       color: COLORS.lightgreen,
       income: [
+        {
+          id: 1,
+          title: "Full Time Job",
+          description: "Full Time Job salary",
+          location: "company",
+          total: 400.0,
+          status: confirmStatus,
+          date: "2024-01-21",
+        },
         {
           id: 2,
           title: "Full Time Job",
@@ -481,7 +618,15 @@ export const GlobalProvider = ({ children }) => {
       },
     });
   }
-
+  function addBudget(categoryId, budget) {
+    dispatch({
+      type: "ADD_TRANSACTION",
+      payload: {
+        categoryId: categoryId,
+        budget: budget,
+      },
+    });
+  }
   return (
     <GlobalContext.Provider
       value={{
@@ -489,6 +634,7 @@ export const GlobalProvider = ({ children }) => {
         incomes: state.incomes,
         deleteTransaction,
         addTransaction, // Đảm bảo truyền đúng tên hàm ở đây
+        addBudget,
       }}
     >
       {children}

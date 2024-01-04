@@ -1,4 +1,12 @@
-import { View, Text, TouchableOpacity, StyleSheet, Image, Button } from "react-native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  Image,
+  Button,
+  FlatList,
+} from "react-native";
 import * as React from "react";
 import StatusCard from "../StatusCard/Card";
 import { useNavigation } from "@react-navigation/native";
@@ -9,8 +17,7 @@ import { GlobalContext } from "../contextAPI/GlobalState";
 import LineChartComponent from "../LineChartComponent";
 import Chart from "../Chart";
 import History from "./History";
-// import { LinearGradient, Stop } from "react-native-svg";
-// import { LineChart, AreaChart, Grid } from "react-native-gifted-charts";
+
 const HomePage = () => {
   const navigation = useNavigation();
   const handleClick = () => {
@@ -20,6 +27,8 @@ const HomePage = () => {
   const [openTransaction, setOpenTransaction] = useState("false");
   const [addIncome, setAddIncome] = useState(true);
   const [addExpense, setAddExpense] = useState(false);
+  const newData = JSON.parse(JSON.stringify(transactions));
+  console.log(newData, "newData");
   const handleClickAddIncome = () => {
     navigation.navigate("TransactionForm", { addIncome: true });
 
@@ -41,15 +50,7 @@ const HomePage = () => {
   const handleOpenTransaction = () => {
     setOpenTransaction(!openTransaction);
   };
-  const dv = [
-    { value: 170 },
-    { value: 220 },
-    { value: 170 },
-    { value: 196 },
-    { value: 176 },
-    { value: 141 },
-    { value: 172 },
-  ];
+
   const educationExpenses = transactions.find(
     (transaction) => transaction.name === "Education"
   ).expenses;
@@ -64,71 +65,231 @@ const HomePage = () => {
       </View>
     );
   }
+  //gom nhóm theo date
+  const groupedTransactions = {};
+  transactions.forEach((transaction) => {
+    const date = transaction.date;
+    if (!groupedTransactions[date]) {
+      groupedTransactions[date] = [transaction];
+    } else {
+      groupedTransactions[date].push(transaction);
+    }
+  });
+
+  // In ra kết quả gom nhóm
+  console.log(groupedTransactions);
+  // Tạo đối tượng chứa thông tin tổng hợp theo ngà
+  // Khởi tạo một đối tượng để lưu trữ dữ liệu gom nhóm
+  const groupedExpenses = {};
+
+  // Duyệt qua mảng "transactions"
+  transactions.forEach((transaction) => {
+    // Duyệt qua mảng "expenses" trong mỗi giao dịch
+    transaction.expenses.forEach((expense) => {
+      // Lấy giá trị của trường "title", "description", "location", "total", "date", "icon", "name" và "color" từ mục chi tiêu
+      const { title, description, location, total, date } = expense;
+      const { icon, name, color } = transaction;
+
+      // Tách ngày, tháng và năm từ trường "date"
+      const [year, month, day] = date.split("-");
+
+      // Tạo khóa cho đối tượng groupedExpenses dựa trên ngày, tháng và năm
+      const key = `${year}-${month}-${day}`;
+
+      // Kiểm tra xem khóa đã tồn tại trong groupedExpenses chưa
+      if (groupedExpenses[key]) {
+        // Nếu khóa đã tồn tại, thêm expense vào mảng tương ứng
+        groupedExpenses[key].push({
+          id: expense.id,
+          location,
+          description,
+          total,
+          icon,
+          name,
+          color,
+        });
+      } else {
+        // Nếu khóa chưa tồn tại, tạo khóa mới và gán một mảng chứa expense
+        groupedExpenses[key] = [
+          {
+            id: expense.id,
+            location,
+            description,
+            total,
+            icon,
+            name,
+            color,
+          },
+        ];
+      }
+    });
+  });
+  const getFormattedDate = (date) => {
+    const currentDate = new Date();
+    const formattedDate = new Date(date);
+
+    if (
+      formattedDate.getDate() === currentDate.getDate() &&
+      formattedDate.getMonth() === currentDate.getMonth() &&
+      formattedDate.getFullYear() === currentDate.getFullYear()
+    ) {
+      return "Today";
+    }
+
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    if (
+      formattedDate.getDate() === yesterday.getDate() &&
+      formattedDate.getMonth() === yesterday.getMonth() &&
+      formattedDate.getFullYear() === yesterday.getFullYear()
+    ) {
+      return "Yesterday";
+    }
+
+    return date;
+  };
+  const ExpenseItem = ({ expense }) => {
+    return (
+      <View style={styles.expenseContainer}>
+        <Text style={styles.location}>{expense.location}</Text>
+        <Text style={styles.description}>{expense.description}</Text>
+        <Text style={styles.total}>{expense.total}</Text>
+      </View>
+    );
+  };
+  // Hàm render dữ liệu gom nhóm
+  const renderGroupedExpenses = (groupedExpenses) => {
+    const sortedEntries = Object.entries(groupedExpenses).sort(
+      ([dateA], [dateB]) => new Date(dateB) - new Date(dateA)
+    );
+
+    let renderedItemCount = 0; // Biến đếm số lượng mục đã hiển thị
+    const maxItemCount = 10; // Số lượng mục tối đa được hiển thị
+
+    return (
+      <View style={styles.container}>
+        {sortedEntries.map(([date, expenses]) => {
+          if (renderedItemCount >= maxItemCount) {
+            return null; // Không hiển thị nếu đã đạt đến giới hạn
+          }
+
+          const limitedExpenses = expenses.slice(
+            0,
+            maxItemCount - renderedItemCount
+          ); // Giới hạn số lượng mục hiển thị
+          renderedItemCount += limitedExpenses.length; // Cập nhật biến đếm
+
+          return (
+            <View key={date} style={styles.groupContainer}>
+              <Text style={styles.date}>{getFormattedDate(date)}</Text>
+              <FlatList
+                data={limitedExpenses}
+                keyExtractor={(expense) =>
+                  `${expense.total}-${expense.location}`
+                }
+                renderItem={({ item }) => <ExpenseItem expense={item} />}
+              />
+            </View>
+          );
+        })}
+      </View>
+    );
+  };
+
+  // In ra dữ liệu theo dạng yêu cầu
+  console.log(groupedExpenses, "groupedExpenses");
+  // Gom nhóm các giao dịch lại theo ngày
+  // transactions.forEach((category) => {
+  //   let { expenses, budget } = category;
+  //   expenses = Object.values(expenses);
+  //   console.log(expenses, "expenses", expenses);
+  //   const groupedExpenses = {};
+  //   expenses.forEach((expense) => {
+  //     const date = expense.date;
+  //     if (!groupedExpenses[date]) {
+  //       groupedExpenses[date] = [expense];
+  //     } else {
+  //       groupedExpenses[date].push(expense);
+  //     }
+  //   });
+  //   category.expenses = groupedExpenses;
+  // });
+  // Gom nhóm giao dịch trong budget theo ngày
+  // const groupedBudget = {};
+  // budget.forEach((item) => {
+  //   const date = item.date;
+  //   if (!groupedBudget[date]) {
+  //     groupedBudget[date] = [item];
+  //   } else {
+  //     groupedBudget[date].push(item);
+  //   }
+  // });
+  // category.budget = groupedBudget;
+  // In ra kết quả gom nhóm
+  console.log(transactions);
+  console.log(groupedTransactions, "grouped transactions");
+  // Render giao dịch gom nhóm theo ngày
+  const renderGroupedTransactions = () => {
+    return Object.entries(groupedTransactions).map(([date, transactions]) => (
+      <View key={date}>
+        <Text>{date}</Text>
+        {transactions.map((transaction) => (
+          <Text key={transaction.id}>{transaction.title}</Text>
+          // Hiển thị thông tin giao dịch khác tùy ý
+        ))}
+      </View>
+    ));
+  };
+  //gom nhóm theo date
 
   return (
     <View
       style={{
         flex: 1,
-
-        justifyContent: "center",
         alignItems: "center",
         backgroundColor: "#F8EFFF",
-
-        //backgroundColor: "white",
       }}
     >
-      {/* <AreaChart
-        data={[10, 20, 30, 40, 50]} // Dữ liệu cho biểu đồ
-        strokeColor="#297AB1" // Màu đường kẻ
-        fillColor="rgba(41, 122, 177, 0.3)" // Màu vùng bên dưới đường kẻ
-        strokeWidth={2} // Độ dày đường kẻ
-        fillGradient={["#297AB1", "#FFFFFF"]} // Gradient cho vùng bên dưới đường kẻ
-        style={{ height: 200 }} // Kích thước biểu đồ
-      >
-        <Grid /> // Hiển thị lưới
-      </AreaChart> */}
-      <TouchableOpacity onPress={handleOpenTransaction}>
-        <Text>New Transaction</Text>
-      </TouchableOpacity>
-      {openTransaction === true && (
-        <View
-          style={{
-            flex: 1,
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        >
-          <TouchableOpacity onPress={handleOpenTransaction}>
-            <Text>Close Transaction</Text>
-          </TouchableOpacity>
-          <View style={styles.buttonContainer}>
-            <Button
-              buttonStyle={[styles.button, styles.cashOutButton]}
-              title="- CASH OUT"
-              onPress={handleClickAddExpense}
-            />
-            <Button
-              buttonStyle={[styles.button, styles.cashInButton]}
-              title="+ CASH IN"
-              onPress={handleClickAddIncome}
-            />
-          </View>
-        </View>
-      )}
       {/* <TransactionForm /> */}
-
-      <View style={{ marginTop: 400 }}></View>
-      {/* <LineChartComponent data={transactions} width={300} height={300} /> */}
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity
+          style={{
+            backgroundColor: "#6ab04c",
+            marginRight: 5,
+            padding: 10,
+            borderRadius: 16,
+          }}
+          // style={[styles.button, styles.cashInButton]}
+          onPress={handleClickAddIncome}
+        >
+          <Text style={[styles.textWhite, styles.textBold]}>+ CASH IN</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={{
+            backgroundColor: "#eb4d4b",
+            marginRight: 5,
+            padding: 10,
+            borderRadius: 16,
+          }}
+          // style={[styles.button, styles.cashOutButton]}
+          onPress={handleClickAddExpense}
+        >
+          <Text style={[styles.textWhite, styles.textBold]}>- CASH OUT</Text>
+        </TouchableOpacity>
+      </View>
+      <View
+        style={{
+          marginTop: 10,
+        }}
+      ></View>
       <LineChartComponent />
-      {/* <Chart /> */}
+
       <StatusCard />
       <View style={{ marginTop: 10 }}>{renderHeaderRecentTransactions()}</View>
       <RecentTransaction transactions={transactions} incomes={incomes} />
-
       {/* <History /> */}
     </View>
   );
-  //20521495_LeDinhTuanKiet
 };
 const styles = StyleSheet.create({
   buttonContainer: {
@@ -147,12 +308,11 @@ const styles = StyleSheet.create({
   recentTrans: {
     marginTop: 150,
   },
+  // button: {
+  //   width: 150,
+  //   borderRadius: 30,
+  // },
   button: {
-    width: 150,
-    borderRadius: 30,
-  },
-  button: {
-    backgroundColor: "blue",
     padding: 10,
     marginTop: 5,
     borderRadius: 5,
@@ -178,6 +338,29 @@ const styles = StyleSheet.create({
   textPurple: {
     fontWeight: "bold",
     color: "#7F3DFF",
+  },
+  groupContainer: {
+    marginBottom: 16,
+  },
+  date: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginBottom: 8,
+  },
+  expenseContainer: {
+    marginBottom: 8,
+  },
+  location: {
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+  description: {
+    fontSize: 14,
+    marginBottom: 4,
+  },
+  total: {
+    fontSize: 14,
+    color: "gray",
   },
 });
 export default HomePage;
