@@ -1,359 +1,163 @@
-import React, { useState, useContext, useEffect } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  TextInput,
-  TouchableOpacity,
-  Alert,
-  FlatList,
-  Button,
-  Image,
-} from "react-native";
+import React, { useState, useContext } from "react";
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert, Image } from "react-native";
 import Slider from "@react-native-community/slider";
-import AddBudget from "./AddBudget";
+import AddBudget from "../BudgetScreen/AddBudget";
 import ProgressBar from "react-native-progress-bar-animated";
 import Svg, { Circle } from "react-native-svg";
 // import { TouchableOpacity } from "react-native-gesture-handler";
-import MonthlyBudget from "./MonthlyBudget";
+
 import { GlobalContext } from "../contextAPI/GlobalState";
 
+import { createStackNavigator } from "@react-navigation/stack";
+const Stack = createStackNavigator();
 const Favorites = ({ navigation }) => {
   const { transactions, incomes } = useContext(GlobalContext);
 
-  const [todayIndex, setTodayIndex] = useState(12);
-  const currentDate = new Date();
-  const year = currentDate.getFullYear();
-  const month = String(currentDate.getMonth() + 1).padStart(2, "0");
-  const [currentPage, setCurrentPage] = useState(13);
-  const [selectedMonth, setSelectedMonth] = useState(getCurrentMonth());
-  const [filteredBudgets, setFilteredBudgets] = useState([]);
+  const [budgetCounter, setBudgetCounter] = useState(1);
+  const [budget, setBudget] = useState(0);
+  const [goal, setGoal] = useState(0);
+  const [debt, setDebt] = useState(0);
+  const [financialBalance, setFinancialBalance] = useState(budget - debt);
+  const progress = 80; // Giá trị tiến độ là 70%
 
-  function getCurrentMonth() {
-    const currentDate = new Date();
-    const currentYear = currentDate.getFullYear();
-    const currentMonth = (currentDate.getMonth() + 1)
-      .toString()
-      .padStart(2, "0");
-    return `${currentYear}-${currentMonth}`;
+  let backgroundColorOnComplete = "#6CC644"; // Mặc định là màu đỏ
+
+  if (progress >= 75) {
+    backgroundColorOnComplete = "#FF0000"; // Xanh lá cây
+  } else if (progress >= 50) {
+    backgroundColorOnComplete = "#FFA500"; // Màu vàng
+  } else if (progress >= 25) {
+    backgroundColorOnComplete = "#FFD700"; // Màu cam
   }
-
-  const currentYear = new Date().getFullYear();
-  const monthsInRange = [];
-  for (let year = currentYear - 1; year <= currentYear; year++) {
-    for (let month = 1; month <= 12; month++) {
-      const formattedMonth = `${year}-${month.toString().padStart(2, "0")}`;
-      monthsInRange.push(formattedMonth);
-    }
-  }
-  console.log(monthsInRange, "monthsInRange");
-
-  const totalPages = Math.ceil(monthsInRange.length);
-
-  const nextPage = () => {
-    if (currentPage < totalPages) {
-      setTodayIndex(todayIndex + 1);
-      setSelectedMonth(monthsInRange[todayIndex + 1]);
-    }
-  };
-
-  const prevPage = () => {
-    if (currentPage > 1) {
-      setTodayIndex(todayIndex - 1);
-      setSelectedMonth(monthsInRange[todayIndex - 1]);
-    }
-  };
-  useEffect(() => {
-    const todayIndex = monthsInRange.findIndex(
-      (item) => item === selectedMonth
-    );
-    console.log(todayIndex, "todayindex1");
-  }, [selectedMonth, monthsInRange]);
-  useEffect(() => {
-    const filteredBudgets = transactions.reduce((filtered, transaction) => {
-      const budgets = transaction.budget
-        .filter((budget) => budget.date === selectedMonth)
-        .map((budget) => ({ ...budget, categoryName: transaction.name }));
-
-      return [...filtered, ...budgets];
-    }, []);
-
-    setFilteredBudgets(filteredBudgets);
-  }, [selectedMonth, transactions]);
-
-  console.log(filteredBudgets, "filteredBudgets");
-  function getCurrentMonth() {
-    const currentDate = new Date();
-    const currentYear = currentDate.getFullYear();
-    const currentMonth = (currentDate.getMonth() + 1)
-      .toString()
-      .padStart(2, "0");
-    return `${currentYear}-${currentMonth}`;
-  }
-
-  console.log(selectedMonth, "selectedMonth");
-  const uniqueMonths = Array.from(
-    new Set(
-      transactions
-        .flatMap((transaction) => transaction.budget)
-        .map((budget) => budget.date)
-    )
-  );
-  // Duyệt qua mảng "transactions"
-  transactions.forEach((transaction) => {
-    // Duyệt qua mảng "expenses" trong mỗi giao dịch
-    transaction.expenses.forEach((expense) => {
-      // Lấy giá trị của trường "total" và trường "date" từ mục chi tiêu
-      const { total, date } = expense;
-      // Tách năm và tháng từ trường "date"
-      const [year, month] = date.split("-");
-      // Tìm mục trong mảng "budget" có trường "date" tương ứng
-      const budgetItem = transaction.budget.find((item) => item.date === date);
-      if (budgetItem) {
-        budgetItem.spent += total;
-      }
-    });
-  });
-
-  console.log(transactions, "updatedtransactions");
-
-  // Khởi tạo mảng totalExpenseInMonth
-  let totalExpenseInMonth = [];
-  transactions.forEach((transaction) => {
-    let totalExpenseInMonth = {};
-    transaction.expenses.forEach((expense) => {
-      const [year, month] = expense.date.split("-");
-      const totalExpense = parseFloat(expense.total);
-      if (totalExpenseInMonth[year] && totalExpenseInMonth[year][month]) {
-        totalExpenseInMonth[year][month] += totalExpense;
-      } else {
-        if (!totalExpenseInMonth[year]) {
-          totalExpenseInMonth[year] = {};
-        }
-        totalExpenseInMonth[year][month] = totalExpense;
-      }
-    });
-
-    for (const year in totalExpenseInMonth) {
-      for (const month in totalExpenseInMonth[year]) {
-        const budget = transaction.budget.find(
-          (item) => item.date === `${year}-${month}`
-        );
-        if (budget) {
-          budget.spent = totalExpenseInMonth[year][month];
-        }
-      }
-    }
-  });
-
-  let backgroundColorOnComplete = "#6CC644";
-
   const addBudget = () => {
     navigation.navigate("AddBudget");
+    console.log("AddBudget");
   };
-  // const renderBudget = (transactions) => {
-  //   return (
-  //     <View>
-  //       {transactions.map((category) => {
-  //         if (category.budget.length > 0) {
-  //           return (
-  //             <View key={category.id}>
-  //               <View style={[styles.budgetHeader]}>
-  //                 <View
-  //                   style={{
-  //                     flexDirection: "row",
-  //                     alignItems: "center",
-  //                     justifyContent: "center",
-  //                     marginTop: 10,
-  //                     borderWidth: 1,
-  //                     borderRadius: 32,
-  //                     borderColor: "#91919F",
-  //                     padding: 3,
-  //                   }}
-  //                 >
-  //                   <Svg width="14" height="14" style={{ margin: 3 }}>
-  //                     <Circle cx="7" cy="7" r="7" fill="red" />
-  //                   </Svg>
-  //                   <Text style={{ marginTop: -3 }}>{category.name}</Text>
-  //                 </View>
-  //                 <View>
-  //                   <Image
-  //                     source={require("../../assets/warning.png")}
-  //                     style={{ height: 28, width: 28 }}
-  //                   ></Image>
-  //                 </View>
-  //               </View>
-  //               {category.budget.map((budgetItem) => {
-  //                 const progress = (budgetItem.spent / budgetItem.total) * 100;
-  //                 console.log(progress, "progressbar");
-  //                 if (progress >= 75) {
-  //                   backgroundColorOnComplete = "#FF0000"; // Xanh lá cây
-  //                 } else if (progress >= 50) {
-  //                   backgroundColorOnComplete = "#FFA500"; // Màu vàng
-  //                 } else if (progress >= 25) {
-  //                   backgroundColorOnComplete = "#FFD700"; // Màu cam
-  //                 } else if (progress >= 0) {
-  //                   backgroundColorOnComplete = "#6CC644";
-  //                 }
-  //                 return (
-  //                   <View key={budgetItem.date}>
-  //                     <Text style={{ fontSize: 22, fontWeight: "bold" }}>
-  //                       Remaining ${budgetItem.total - budgetItem.spent}
-  //                     </Text>
-  //                     <ProgressBar
-  //                       width={200}
-  //                       value={progress}
-  //                       backgroundColor={backgroundColorOnComplete}
-  //                     />
-  //                     <Text
-  //                       style={{
-  //                         fontSize: 14,
-  //                         color: backgroundColorOnComplete,
-  //                       }}
-  //                     >
-  //                       {budgetItem.spent} of {budgetItem.total}
-  //                     </Text>
-  //                     {progress >= 75 && (
-  //                       <View>
-  //                         <Text style={{ color: backgroundColorOnComplete }}>
-  //                           Your budget is running low
-  //                         </Text>
-  //                       </View>
-  //                     )}
-  //                   </View>
-  //                 );
-  //               })}
-  //             </View>
-  //           );
-  //         } else {
-  //           return null; // Không hiển thị giao dịch nếu không có ngân sách
-  //         }
-  //       })}
-  //     </View>
-  //   );
-  // };
-  useEffect(() => {
-    const todayIndex = monthsInRange.findIndex(
-      (item) => item === selectedMonth
-    );
-  }, [selectedMonth, monthsInRange]);
+  const onBudgetChange = (value) => {
+    setBudget(value);
+    updateFinancialBalance(value, debt);
+  };
+  const onGoalChange = (value) => {
+    setGoal(value);
+  };
+
+  const onDebtChange = (value) => {
+    setDebt(value);
+    updateFinancialBalance(budget, value);
+  };
+  const updateFinancialBalance = (budgetValue, debtValue) => {
+    const balance = budgetValue - debtValue;
+    setFinancialBalance(balance);
+  };
+
+  const onSaveBudget = () => {
+    console.log("Lưu thành công", `Ngân sách hiện tại: ${budget}$, Mục tiêu tài chính: ${goal}$`);
+    Alert.alert("Saved");
+  };
+
   return (
     <View style={styles.container}>
-      <View
-        style={{
-          flexDirection: "row",
-          justifyContent: "center",
-          alignItems: "center",
-        }}
-      >
-        <TouchableOpacity onPress={prevPage} disabled={currentPage === 1}>
-          <Text style={{ fontSize: 30, marginRight: 10 }}>&#8249;</Text>
-        </TouchableOpacity>
-        <Text style={{ marginHorizontal: 10, marginTop: 5 }}>
-          {selectedMonth}
-        </Text>
-        <TouchableOpacity
-          onPress={nextPage}
-          disabled={currentPage === totalPages}
-        >
-          <Text style={{ fontSize: 30, marginLeft: 10 }}>&#8250;</Text>
-        </TouchableOpacity>
-      </View>
-      {filteredBudgets.length > 0 ? (
-        <FlatList
-          data={filteredBudgets}
-          keyExtractor={(item, index) => `${item.categoryName}`}
-          renderItem={({ item }) => {
-            const progress = (item.spent / item.total) * 100;
-            let backgroundColorOnComplete = "";
-            if (progress > 100) progress = 100;
-            if (progress >= 75) {
-              backgroundColorOnComplete = "#FF0000"; // Xanh lá cây
-            } else if (progress >= 50) {
-              backgroundColorOnComplete = "#FFA500"; // Màu vàng
-            } else if (progress >= 25) {
-              backgroundColorOnComplete = "#FFD700"; // Màu cam
-            } else backgroundColorOnComplete = "#6CC644";
-            return (
+      <Text style={{ color: "#7F3DFF", fontWeight: "bold" }}>Current Month</Text>
+      {budgetCounter == 0 ? (
+        <View>
+          <Text style={styles.noBudgetText}>You dont have budget.</Text>
+          <Text style={styles.noBudgetText}>Let's make one so you in control</Text>
+        </View>
+      ) : (
+        <View style={styles.budgetContainer}>
+          {/* BudgetComponent */}
+          <View>
+            <View style={styles.budgetHeader}>
               <View
-                key={`${item.categoryName}`}
                 style={{
-                  borderWidth: 2,
-                  borderColor: backgroundColorOnComplete,
-                  borderRadius: 20,
-                  padding: 10,
-                  margin: 5,
+                  flexDirection: "row",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  borderWidth: 1,
+                  borderRadius: 32,
+                  borderColor: "#91919F",
+                  width: 109,
+                  height: 40,
                 }}
               >
-                <View
-                  style={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    marginTop: 10,
-                    borderWidth: 1,
-                    borderRadius: 32,
-                    borderColor: "#91919F",
-                    padding: 3,
-                  }}
-                >
-                  <Svg width="14" height="14" style={{ margin: 3 }}>
-                    <Circle
-                      cx="7"
-                      cy="7"
-                      r="7"
-                      fill={backgroundColorOnComplete}
-                    />
-                  </Svg>
-                  <Text style={{ marginTop: -3 }}>{item.categoryName}</Text>
-                </View>
-                <View>
-                  <Image
-                    source={require("../../assets/warning.png")}
-                    style={{ height: 28, width: 28 }}
-                  />
-                </View>
-                <Text style={{ fontSize: 22, fontWeight: "bold" }}>
-                  Remaining ${item.total - item.spent}
-                </Text>
-                <ProgressBar
-                  width={200}
-                  value={progress}
-                  backgroundColor={backgroundColorOnComplete}
-                />
-                <Text
-                  style={{
-                    fontSize: 14,
-                    color: backgroundColorOnComplete,
-                  }}
-                >
-                  {item.spent} of {item.total}
-                </Text>
-                {progress === 100 ? (
-                  <>
-                    <Text style={{ color: backgroundColorOnComplete }}>
-                      Your budget has run out
-                    </Text>
-                  </>
-                ) : progress > 75 ? (
-                  <>
-                    <Text style={{ color: backgroundColorOnComplete }}>
-                      Your budget is running low
-                    </Text>
-                  </>
-                ) : (
-                  <></>
-                )}
+                <Svg width="14" height="14" style={{ margin: 3 }}>
+                  <Circle cx="7" cy="7" r="7" fill="red" />
+                </Svg>
+                <Text style={{ marginTop: -3, padding: 10 }}>Shopping</Text>
               </View>
-            );
-          }}
-        />
-      ) : (
-        <Text>No budgets found for the selected month</Text>
+              <View>
+                <Image
+                  source={require("../../assets/warning.png")}
+                  style={{ height: 28, width: 28, marginLeft: 150 }}
+                ></Image>
+              </View>
+            </View>
+            <View>
+              <Text style={{ fontSize: 22, fontWeight: "bold" }}>Remaining $0</Text>
+              <ProgressBar
+                width={200}
+                value={progress}
+                backgroundColor={backgroundColorOnComplete}
+              />
+              <Text style={{ fontSize: 14, color: backgroundColorOnComplete }}>1000$ of 1200$</Text>
+            </View>
+          </View>
+        </View>
       )}
+
       <TouchableOpacity onPress={addBudget} style={styles.addBudgetButton}>
         <Text style={styles.addBudgetText}>Create a budget</Text>
       </TouchableOpacity>
+      {/* <Text style={styles.title}>Planner</Text>
+      <Text style={styles.label}>Current budget:</Text>
+      <View>
+        <Text>budgets area</Text>
+      </View>
+      <TouchableOpacity onPress={addBudget}>
+        <Text>Add New Budget</Text>
+      </TouchableOpacity>
+      <View>
+        <Text>budgets area</Text>
+      </View>
+      <TouchableOpacity onPress={addBudget}>
+        <Text>Add New Budget</Text>
+      </TouchableOpacity>
+      <Text style={styles.title}>Budget Planner</Text>
+      <Text style={styles.title}>Your Balanced: 2000$</Text>
+      <Text style={styles.budgetText}>Current Budget: {budget}$</Text>
+      <Slider
+        style={styles.slider}
+        minimumValue={0}
+        maximumValue={2000}
+        step={100}
+        value={budget}
+        onValueChange={onBudgetChange}
+      />
+      <TextInput
+        style={styles.input}
+        keyboardType="numeric"
+        value={budget.toString()}
+        onChangeText={onBudgetChange}
+      />
+      <Text style={styles.label}>Goal: </Text>
+      <TextInput
+        style={styles.input}
+        keyboardType="numeric"
+        value={goal.toString()}
+        onChangeText={onGoalChange}
+      />
+      <Text style={styles.label}>Debt: </Text>
+      <TextInput
+        style={styles.input}
+        keyboardType="numeric"
+        value={debt.toString()}
+        onChangeText={onDebtChange}
+      />
+      <Text style={styles.label}>Current Balanced: </Text>
+      <Text>{financialBalance}$</Text>
+      <TouchableOpacity style={styles.buttonSave} onPress={onSaveBudget}>
+        <Text style={styles.text}>Save</Text>
+      </TouchableOpacity> */}
     </View>
   );
 };
@@ -361,8 +165,20 @@ const Favorites = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
+
     alignItems: "center",
+    justifyContent: "flex-start",
+  },
+  budgetContainer: {
+    //flex: 1,
+
+    alignItems: "flex-start",
+    justifyContent: "flex-start",
+    backgroundColor: "#fff",
+    padding: 16,
+    borderRadius: 16,
+
+    height: 200,
   },
   title: {
     fontSize: 20,
@@ -420,7 +236,10 @@ const styles = StyleSheet.create({
   budgetHeader: {
     flex: 1,
     flexDirection: "row",
+    alignItems: "center",
     justifyContent: "space-between",
+    width: 300,
+    height: 1,
   },
 });
 
