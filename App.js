@@ -13,6 +13,8 @@ import LoginScreen from "./components/screens/LoginScreen";
 import LaunchScreen from "./components/screens/LaunchScreen";
 import SignupScreen from "./components/screens/SignupScreen";
 import SignUpVerificationScreen from "./components/screens/SignUpVerificationScreen";
+import AccountScreen from "./components/Tabs/ProfileDetail/AccountScreen";
+import ProfileScreen from "./components/Tabs/ProfileScreen";
 import { GlobalProvider } from "./components/contextAPI/GlobalState";
 
 import { useState, useEffect } from "react";
@@ -107,11 +109,7 @@ export default function App() {
             }}
           /> */}
           {user ? (
-            <Drawer.Screen
-              name="Home"
-              component={Home}
-              options={{ headerShown: false }}
-            />
+            <Drawer.Screen name="Home" component={Home} options={{ headerShown: false }} />
           ) : (
             <>
               <Drawer.Screen

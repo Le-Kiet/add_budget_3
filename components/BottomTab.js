@@ -4,7 +4,7 @@ import { StyleSheet, View, Text } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import Favorites from "./Tabs/Favorites";
 import Categories from "./Tabs/Categories";
-import Profile from "./Tabs/Profile";
+import Profile from "./Tabs/ProfileScreen";
 import Home from "./HomeScreen/Home";
 
 const Tab = createBottomTabNavigator();
@@ -23,7 +23,7 @@ const BottomTabNavigator = () => {
             <Ionicons
               name="home"
               size={size}
-              style={[styles.tabIcon, { color: color === "blue" ? "blue" : "gray" }]}
+              style={[styles.tabIcon, { color: color === "#7F3DFF" ? "#7F3DFF" : "gray" }]}
             />
           ),
           headerShown: false,
@@ -37,7 +37,7 @@ const BottomTabNavigator = () => {
             <Ionicons
               name="grid"
               size={size}
-              style={[styles.tabIcon, { color: color === "blue" ? "blue" : "gray" }]}
+              style={[styles.tabIcon, { color: color === "#7F3DFF" ? "#7F3DFF" : "gray" }]}
             />
           ),
         }}
@@ -51,7 +51,7 @@ const BottomTabNavigator = () => {
               <Ionicons
                 name="wallet"
                 size={size}
-                style={[styles.tabIcon, { color: color === "blue" ? "blue" : "gray" }]}
+                style={[styles.tabIcon, { color: color === "#7F3DFF" ? "#7F3DFF" : "gray" }]}
               />
               {favoriteCount > 0 && (
                 <View style={styles.badgeContainer}>
@@ -70,7 +70,7 @@ const BottomTabNavigator = () => {
             <Ionicons
               name="person"
               size={size}
-              style={[styles.tabIcon, { color: color === "blue" ? "blue" : "gray" }]}
+              style={[styles.tabIcon, { color: color === "#7F3DFF" ? "#7F3DFF" : "gray" }]}
             />
           ),
         }}
@@ -82,7 +82,7 @@ const BottomTabNavigator = () => {
 
 const styles = StyleSheet.create({
   tabBarOptions: {
-    activeTintColor: "blue",
+    activeTintColor: "#7F3DFF",
     inactiveTintColor: "gray",
     style: {
       borderTopWidth: 1,

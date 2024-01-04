@@ -2,7 +2,9 @@ import { View, Text, Button, StyleSheet, TouchableOpacity, Image } from "react-n
 import * as React from "react";
 import { FIREBASE_AUTH } from "../../FirebaseConfig";
 import Ionicons from "react-native-vector-icons/Ionicons";
-const Profile = ({ navigation }) => {
+import { useNavigation } from "@react-navigation/native";
+
+const ProfileScreen = ({ navigation }) => {
   const userData = {
     username: "Ngan Giang",
     email: "ngangiang22@gmail.com",
@@ -11,6 +13,9 @@ const Profile = ({ navigation }) => {
 
   const handleLogout = () => {
     navigation.navigate("Home");
+  };
+  const handleAccount = () => {
+    navigation.navigate("Account");
   };
 
   const handleEditProfile = () => {
@@ -31,7 +36,7 @@ const Profile = ({ navigation }) => {
         <Text style={styles.title}> SETTING</Text>
       </View>
       <View style={styles.optionSetting}>
-        <TouchableOpacity style={styles.lineOption}>
+        <TouchableOpacity style={styles.lineOption} onPress={handleAccount}>
           <Text style={styles.textProfile}>Quản lý tài khoản/thẻ</Text>
           <Ionicons name="arrow-forward" size={20} color="#0D0E0F" />
         </TouchableOpacity>
@@ -144,4 +149,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Profile;
+export default ProfileScreen;
