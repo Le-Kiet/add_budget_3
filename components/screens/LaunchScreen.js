@@ -8,36 +8,6 @@ import {
   FlatList,
 } from "react-native";
 import AppIntroSlider from "react-native-app-intro-slider";
-const FirstSlide = () => {
-  return (
-    <View>
-      <FlatList
-        data={slides}
-        renderItem={renderItem}
-        keyExtractor={(item) => item.id.toString()}
-        horizontal
-        pagingEnabled
-        showsHorizontalScrollIndicator={false}
-      />
-    </View>
-  );
-};
-
-const SecondSlide = () => {
-  return (
-    <View>
-      <Text>This is the Categories component</Text>
-    </View>
-  );
-};
-
-const ThirdSlide = () => {
-  return (
-    <View>
-      <Text>This is the Budget component</Text>
-    </View>
-  );
-};
 
 const LaunchScreen = ({ navigation }) => {
   const [showRealApp, setShowRealApp] = useState(false);
@@ -88,7 +58,7 @@ const LaunchScreen = ({ navigation }) => {
     {
       id: 2,
       image: {
-        uri: "https://i.imgur.com/mPMldcU.png",
+        uri: "https://imgur.com/55cKqV7.png",
       },
       text1: "Take charge of your finances with ease",
       text2:
@@ -97,7 +67,7 @@ const LaunchScreen = ({ navigation }) => {
     {
       id: 3,
       image: {
-        uri: "https://i.imgur.com/mPMldcU.png",
+        uri: "https://i.imgur.com/a8sWwD2.png",
       },
       text1: "Planning ahead",
       text2: "Set up your budget for each category so you in control",

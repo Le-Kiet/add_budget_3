@@ -129,6 +129,7 @@ const Categories = () => {
 
     for (const year in totalExpenseInMonth) {
       for (const month in totalExpenseInMonth[year]) {
+        console.log(transaction, "06-01-2024");
         const budget = transaction.budget.find(
           (item) => item.date === `${year}-${month}`
         );
@@ -276,7 +277,7 @@ const Categories = () => {
       <TouchableOpacity
         onPress={() => setSelectedCategory(item)}
         style={{
-          flex: 1,
+          flex: 0.8,
           flexDirection: "row",
           alignItems: "flex-start",
           margin: 5,
@@ -329,7 +330,7 @@ const Categories = () => {
               }).start();
             } else {
               Animated.timing(categoryListHeightAnimationValue, {
-                toValue: 172.5,
+                toValue: 300,
                 duration: 500,
                 useNativeDriver: false,
               }).start();
@@ -412,7 +413,7 @@ const Categories = () => {
               }).start();
             } else {
               Animated.timing(categoryListHeightAnimationValue, {
-                toValue: 172.5,
+                toValue: 300,
                 duration: 500,
                 useNativeDriver: false,
               }).start();
@@ -520,20 +521,20 @@ const Categories = () => {
       <View
         style={{
           flexDirection: "row",
+          width: 400,
           padding: SIZES.padding,
           justifyContent: "space-between",
           alignItems: "center",
+          marginLeft: 40,
         }}
       >
-        {/* Title */}
-        <View>
+        <View style={{}}>
           <Text style={{ color: COLORS.primary, ...FONTS.h3 }}>CATEGORIES</Text>
           <Text style={{ color: COLORS.darkgray, ...FONTS.body4 }}>
             {categories.length} Total
           </Text>
         </View>
 
-        {/* Button */}
         <View style={{ flexDirection: "row" }}>
           <TouchableOpacity
             style={{
@@ -543,6 +544,7 @@ const Categories = () => {
               height: 50,
               width: 50,
               borderRadius: 25,
+              marginLeft: 170,
             }}
             onPress={() => setViewMode("chart")}
           >
@@ -588,9 +590,11 @@ const Categories = () => {
       <View
         style={{
           flexDirection: "row",
+          width: 400,
           padding: SIZES.padding,
           justifyContent: "space-between",
           alignItems: "center",
+          marginLeft: 40,
         }}
       >
         {/* Title */}
@@ -602,7 +606,7 @@ const Categories = () => {
         </View>
 
         {/* Button */}
-        <View style={{ flexDirection: "row" }}>
+        <View style={{ flexDirection: "row", marginLeft: 180 }}>
           <TouchableOpacity
             style={{
               alignItems: "center",
@@ -673,8 +677,6 @@ const Categories = () => {
         date: selectedMonth,
       };
     });
-    console.log(chartDataByMonth, "IncomechartDataByMonth");
-    console.log(1, "incomechartDataByMonth");
     let filterChartDataByMonth = chartDataByMonth.filter((a) => a.y > 0);
     let totalExpenseByMonth = filterChartDataByMonth.reduce(
       (a, b) => a + (b.y || 0),
@@ -686,7 +688,6 @@ const Categories = () => {
       return {
         label: `${percentage}%`,
         y: Number(item.y),
-        // expenseCount: item.expenseCount,
         color: item.color,
         name: item.name,
         id: item.id,
@@ -702,7 +703,6 @@ const Categories = () => {
       let dataByMonth = item.income.filter(
         (a) => a.date.slice(0, 7) === previousMonth
       );
-      console.log(dataByMonth, "dataByMonth");
 
       var total = dataByMonth.reduce((a, b) => a + (b.total || 0), 0);
       console.log(previousMonth, "previousMonth");
@@ -710,14 +710,12 @@ const Categories = () => {
       return {
         name: item.name,
         y: total,
-        // expenseCount: confirmExpenses.length,
         color: item.color,
         id: item.id,
         date: previousMonth,
       };
     });
-    console.log(chartDataByMonth, "IncomechartDataByMonth");
-    console.log(1, "incomechartDataByMonth");
+
     let filterChartDataByMonth = chartDataByMonth.filter((a) => a.y > 0);
     let totalExpenseByMonth = filterChartDataByMonth.reduce(
       (a, b) => a + (b.y || 0),
@@ -729,7 +727,6 @@ const Categories = () => {
       return {
         label: `${percentage}%`,
         y: Number(item.y),
-        // expenseCount: item.expenseCount,
         color: item.color,
         name: item.name,
         id: item.id,
@@ -738,7 +735,6 @@ const Categories = () => {
     return finalChartDataByMonth;
   }
   function processCategoryDataToDisplay() {
-    // Filter expenses with "Confirmed" status
     let chartData = categories.map((item) => {
       let confirmExpenses = item.expenses.filter((a) => a.status == "C");
       var total = confirmExpenses.reduce((a, b) => a + (b.total || 0), 0);
@@ -763,29 +759,24 @@ const Categories = () => {
       return {
         name: item.name,
         y: total,
-        // expenseCount: confirmExpenses.length,
         color: item.color,
         id: item.id,
         date: selectedMonth,
       };
     });
-    // filter out categories with no data/expenses
     let filterChartDataByMonth = chartDataByMonth.filter((a) => a.y > 0);
     let filterChartData = chartData.filter((a) => a.y > 0);
 
-    // Calculate the total expenses
     let totalExpenseByMonth = filterChartDataByMonth.reduce(
       (a, b) => a + (b.y || 0),
       0
     );
     let totalExpense = filterChartData.reduce((a, b) => a + (b.y || 0), 0);
-    // Calculate percentage and repopulate chart data
     let finalChartDataByMonth = filterChartDataByMonth.map((item) => {
       let percentage = ((item.y / totalExpenseByMonth) * 100).toFixed(0);
       return {
         label: `${percentage}%`,
         y: Number(item.y),
-        // expenseCount: item.expenseCount,
         color: item.color,
         name: item.name,
         id: item.id,
@@ -794,7 +785,6 @@ const Categories = () => {
     return finalChartDataByMonth;
   }
   function processCategoryDataToDisplayPreviousMonth() {
-    // Filter expenses with "Confirmed" status
     let chartData = categories.map((item) => {
       let confirmExpenses = item.expenses.filter((a) => a.status == "C");
       var total = confirmExpenses.reduce((a, b) => a + (b.total || 0), 0);
@@ -852,6 +842,7 @@ const Categories = () => {
   console.log(processCategoryDataToDisplay(), "processCategoryDataToDisplay");
   function renderCategoryList() {
     const renderItem = ({ item }) => (
+      // <View style={{ marginLeft: 15 }}>
       <TouchableOpacity
         onPress={() => setSelectedCategory(item)}
         style={{
@@ -859,7 +850,7 @@ const Categories = () => {
           flexDirection: "row",
           margin: 5,
           paddingVertical: SIZES.radius,
-          paddingHorizontal: SIZES.padding,
+          padding: 10,
           borderRadius: 5,
           backgroundColor: COLORS.white,
           ...styles.shadow,
@@ -874,11 +865,16 @@ const Categories = () => {
           }}
         />
         <Text
-          style={{ marginLeft: SIZES.base, color: COLORS.primary, ...FONTS.h4 }}
+          style={{
+            marginLeft: SIZES.base,
+            color: COLORS.primary,
+            ...FONTS.h4,
+          }}
         >
           {item.name}
         </Text>
       </TouchableOpacity>
+      // </View>
     );
 
     return (
@@ -907,7 +903,7 @@ const Categories = () => {
               }).start();
             } else {
               Animated.timing(categoryListHeightAnimationValue, {
-                toValue: 172.5,
+                toValue: 250,
                 duration: 500,
                 useNativeDriver: false,
               }).start();
@@ -934,6 +930,7 @@ const Categories = () => {
   }
   function renderChart() {
     let chartData = processCategoryDataToDisplay();
+    console.log(chartData, "chartData");
     let colorScales = chartData.map((item) => item.color);
     let totalExpenseCount = chartData.reduce(
       (a, b) => a + (b.expenseCount || 0),
@@ -1002,52 +999,34 @@ const Categories = () => {
       // Android workaround by wrapping VictoryPie with SVG
       return (
         <View style={{ alignItems: "center", justifyContent: "center" }}>
-          <Svg width={600} height={600} style={{ width: 600, height: "auto" }}>
+          <Svg width={500} height={500} style={{ width: 500, height: "auto" }}>
             <VictoryPie
               labels={(datum) => `${datum.y}`}
               standalone={false}
               data={chartData}
               radius={({ datum }) =>
                 selectedCategory && selectedCategory.name == datum.name
-                  ? 600 * 0.4
-                  : 600 * 0.4 - 10
+                  ? 500 * 0.4
+                  : 500 * 0.4 - 10
               }
               innerRadius={100}
-              labelRadius={({ innerRadius }) => (600 * 0.4 + innerRadius) / 2.5}
+              labelRadius={({ innerRadius }) => (500 * 0.4 + innerRadius) / 2.5}
               style={{
                 labels: { fill: "white" },
                 parent: {
                   ...styles.shadow,
                 },
               }}
-              width={600}
-              height={600}
+              width={500}
+              height={500}
               colorScale={colorScales}
-              // events={[
-              //   {
-              //     target: "data",
-              //     eventHandlers: {
-              //       onPress: () => {
-              //         return [
-              //           {
-              //             target: "labels",
-              //             mutation: (props) => {
-              //               let categoryName = chartData[props.index].name;
-              //               setSelectCategoryByName(categoryName);
-              //             },
-              //           },
-              //         ];
-              //       },
-              //     },
-              //   },
-              // ]}
             />
           </Svg>
           <View
             style={{
               position: "absolute",
-              top: "42%",
-              left: "37%",
+              top: "43%",
+              left: "33%",
               transform: [{ scale: 0.8 }],
             }}
           >
@@ -1134,26 +1113,26 @@ const Categories = () => {
       // Android workaround by wrapping VictoryPie with SVG
       return (
         <View style={{ alignItems: "center", justifyContent: "center" }}>
-          <Svg width={600} height={600} style={{ width: 600, height: "auto" }}>
+          <Svg width={500} height={500} style={{ width: 500, height: "auto" }}>
             <VictoryPie
               labels={(datum) => `${datum.y}`}
               standalone={false}
               data={chartData}
               radius={({ datum }) =>
                 selectedCategory && selectedCategory.name == datum.name
-                  ? 600 * 0.4
-                  : 600 * 0.4 - 10
+                  ? 500 * 0.4
+                  : 500 * 0.4 - 10
               }
               innerRadius={100}
-              labelRadius={({ innerRadius }) => (600 * 0.4 + innerRadius) / 2.5}
+              labelRadius={({ innerRadius }) => (500 * 0.4 + innerRadius) / 2.5}
               style={{
                 labels: { fill: "white" },
                 parent: {
                   ...styles.shadow,
                 },
               }}
-              width={600}
-              height={600}
+              width={500}
+              height={500}
               colorScale={colorScales}
               // events={[
               //   {
@@ -1176,10 +1155,10 @@ const Categories = () => {
             />
           </Svg>
           <View style={{ position: "absolute", top: "42%", left: "37%" }}>
-            <Text style={{ ...FONTS.body3, textAlign: "center" }}>
+            <Text style={{ ...FONTS.body4, textAlign: "center" }}>
               Total Income Amount
             </Text>
-            <Text style={{ ...FONTS.h1, textAlign: "center" }}>
+            <Text style={{ ...FONTS.h2, textAlign: "center" }}>
               {totalIncome} $
             </Text>
           </View>
@@ -1191,65 +1170,69 @@ const Categories = () => {
     let data = processCategoryDataToDisplay();
 
     const renderItem = ({ item }) => (
-      <TouchableOpacity
-        style={{
-          flexDirection: "row",
-          height: 40,
-          paddingHorizontal: SIZES.radius,
-          borderRadius: 10,
-          backgroundColor:
-            selectedCategory && selectedCategory.name == item.name
-              ? item.color
-              : COLORS.white,
-        }}
-        onPress={() => {
-          let categoryName = item.name;
-          setSelectCategoryByName(categoryName);
-        }}
-      >
-        {/* Name/Category */}
-        <View style={{ flex: 1, flexDirection: "row", alignItems: "center" }}>
-          <View
-            style={{
-              width: 20,
-              height: 20,
-              backgroundColor:
-                selectedCategory && selectedCategory.name == item.name
-                  ? COLORS.white
-                  : item.color,
-              borderRadius: 5,
-            }}
-          />
+      <View style={{ width: 400, marginLeft: 35 }}>
+        <TouchableOpacity
+          style={{
+            flexDirection: "row",
+            height: 40,
+            paddingHorizontal: SIZES.radius,
+            borderRadius: 10,
+            backgroundColor:
+              selectedCategory && selectedCategory.name == item.name
+                ? item.color
+                : COLORS.white,
+          }}
+          onPress={() => {
+            let categoryName = item.name;
+            setSelectCategoryByName(categoryName);
+          }}
+        >
+          {/* Name/Category */}
+          <View style={{ flex: 1, flexDirection: "row", alignItems: "center" }}>
+            <View
+              style={{
+                width: 20,
+                height: 20,
+                backgroundColor:
+                  selectedCategory && selectedCategory.name == item.name
+                    ? COLORS.white
+                    : item.color,
+                borderRadius: 5,
+              }}
+            />
 
-          <Text
-            style={{
-              marginLeft: SIZES.base,
-              color:
-                selectedCategory && selectedCategory.name == item.name
-                  ? COLORS.white
-                  : COLORS.primary,
-              ...FONTS.h3,
-            }}
-          >
-            {item.name}
-          </Text>
-        </View>
+            <Text
+              style={{
+                marginLeft: SIZES.base,
+                color:
+                  selectedCategory && selectedCategory.name == item.name
+                    ? COLORS.white
+                    : COLORS.primary,
+                ...FONTS.h3,
+              }}
+            >
+              {item.name}
+            </Text>
+          </View>
 
-        {/* Expenses */}
-        <View style={{ justifyContent: "center" }}>
-          <Text
-            style={{
-              color:
-                selectedCategory && selectedCategory.name == item.name
-                  ? COLORS.white
-                  : COLORS.primary,
-              ...FONTS.h3,
-            }}
-          >
-            {item.y} USD - {item.label}
-          </Text>
-        </View>
-      </TouchableOpacity>
+          {/* Expenses */}
+          <View style={{ justifyContent: "center" }}>
+            <Text
+              style={{
+                paddingRight: 10,
+
+                color:
+                  selectedCategory && selectedCategory.name == item.name
+                    ? COLORS.white
+                    : COLORS.primary,
+                ...FONTS.h3,
+              }}
+            >
+              {item.y} USD - {item.label}
+            </Text>
+          </View>
+        </TouchableOpacity>
+      </View>
     );
 
     return (
@@ -1267,65 +1250,67 @@ const Categories = () => {
     let data = processIncomeDataToDisplay();
 
     const renderItem = ({ item }) => (
-      <TouchableOpacity
-        style={{
-          flexDirection: "row",
-          height: 40,
-          paddingHorizontal: SIZES.radius,
-          borderRadius: 10,
-          backgroundColor:
-            selectedCategory && selectedCategory.name == item.name
-              ? item.color
-              : COLORS.white,
-        }}
-        onPress={() => {
-          let categoryName = item.name;
-          setSelectCategoryByName(categoryName);
-        }}
-      >
-        {/* Name/Category */}
-        <View style={{ flex: 1, flexDirection: "row", alignItems: "center" }}>
-          <View
-            style={{
-              width: 20,
-              height: 20,
-              backgroundColor:
-                selectedCategory && selectedCategory.name == item.name
-                  ? COLORS.white
-                  : item.color,
-              borderRadius: 5,
-            }}
-          />
+      <View style={{ width: 400, marginLeft: 35 }}>
+        <TouchableOpacity
+          style={{
+            flexDirection: "row",
+            height: 40,
+            paddingHorizontal: SIZES.radius,
+            borderRadius: 10,
+            backgroundColor:
+              selectedCategory && selectedCategory.name == item.name
+                ? item.color
+                : COLORS.white,
+          }}
+          onPress={() => {
+            let categoryName = item.name;
+            setSelectCategoryByName(categoryName);
+          }}
+        >
+          {/* Name/Category */}
+          <View style={{ flex: 1, flexDirection: "row", alignItems: "center" }}>
+            <View
+              style={{
+                width: 20,
+                height: 20,
+                backgroundColor:
+                  selectedCategory && selectedCategory.name == item.name
+                    ? COLORS.white
+                    : item.color,
+                borderRadius: 5,
+              }}
+            />
 
-          <Text
-            style={{
-              marginLeft: SIZES.base,
-              color:
-                selectedCategory && selectedCategory.name == item.name
-                  ? COLORS.white
-                  : COLORS.primary,
-              ...FONTS.h3,
-            }}
-          >
-            {item.name}
-          </Text>
-        </View>
+            <Text
+              style={{
+                marginLeft: SIZES.base,
+                color:
+                  selectedCategory && selectedCategory.name == item.name
+                    ? COLORS.white
+                    : COLORS.primary,
+                ...FONTS.h3,
+              }}
+            >
+              {item.name}
+            </Text>
+          </View>
 
-        {/* Expenses */}
-        <View style={{ justifyContent: "center" }}>
-          <Text
-            style={{
-              color:
-                selectedCategory && selectedCategory.name == item.name
-                  ? COLORS.white
-                  : COLORS.primary,
-              ...FONTS.h3,
-            }}
-          >
-            {item.y} USD - {item.label}
-          </Text>
-        </View>
-      </TouchableOpacity>
+          {/* Expenses */}
+          <View style={{ justifyContent: "center" }}>
+            <Text
+              style={{
+                color:
+                  selectedCategory && selectedCategory.name == item.name
+                    ? COLORS.white
+                    : COLORS.primary,
+                ...FONTS.h3,
+              }}
+            >
+              {item.y} USD - {item.label}
+            </Text>
+          </View>
+        </TouchableOpacity>
+      </View>
     );
 
     return (
@@ -1341,33 +1326,7 @@ const Categories = () => {
   }
   const previousMonthIndex = todayIndex - 1;
   const previousMonth = monthsInRange[previousMonthIndex];
-  // function compareTotalY(currentMonthData, previousMonthData) {
-  //   let currentMonthTotal = 0;
-  //   let previousMonthTotal = 0;
-  //   console.log("compareTotalY");
-  //   currentMonthData.forEach((item) => {
-  //     currentMonthTotal += item.y;
-  //   });
 
-  //   previousMonthData.forEach((item) => {
-  //     previousMonthTotal += item.y;
-  //   });
-
-  //   // So sánh tổng giá trị hoặc tính phần trăm thay đổi tùy theo nhu cầu của bạn
-  //   const difference = (currentMonthTotal / previousMonthTotal) * 100 - 100;
-  //   console.log("Tổng giá trị tháng hiện tại:", currentMonthTotal);
-  //   console.log("Tổng giá trị tháng trước:", previousMonthTotal);
-  //   console.log("Sự khác biệt:", difference);
-  // }
-  // console.log(
-  //   // processIncomeDataToDisplay(selectedMonth),
-  //   // processIncomeDataToDisplay(previousMonth),
-  //   compareTotalY(
-  //     processIncomeDataToDisplay(selectedMonth),
-  //     processIncomeDataToDisplay(previousMonth)
-  //   ),
-  //   "compare"
-  // );
   return (
     <ScrollView contentContainerStyle={styles.container}>
       {renderHeader()}
@@ -1396,7 +1355,9 @@ const Categories = () => {
         <View>
           {renderChart()}
           {renderCategoryHeaderSection()}
-          {viewMode == "chart" && <View>{renderCategoryList()}</View>}
+          {viewMode == "chart" && (
+            <View style={{ marginLeft: 30 }}>{renderCategoryList()}</View>
+          )}
           {viewMode == "list" && <View>{renderExpenseSummary()}</View>}
         </View>
       )}
@@ -1404,7 +1365,9 @@ const Categories = () => {
         <View>
           {renderIncomeChart()}
           {renderIncomeHeaderSection()}
-          {viewMode == "chart" && <View>{renderIncomeList()}</View>}
+          {viewMode == "chart" && (
+            <View style={{ marginLeft: 30 }}>{renderIncomeList()}</View>
+          )}
           {viewMode == "list" && <View>{renderIncomeSummary()}</View>}
         </View>
       )}
@@ -1415,7 +1378,7 @@ const Categories = () => {
 export default Categories;
 const styles = StyleSheet.create({
   container: {
-    width: 600,
+    width: 400,
     justifyContent: "center",
     alignItems: "center",
   },

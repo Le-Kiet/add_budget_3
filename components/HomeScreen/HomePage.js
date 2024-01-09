@@ -6,6 +6,7 @@ import {
   Image,
   Button,
   FlatList,
+  ScrollView,
 } from "react-native";
 import * as React from "react";
 import StatusCard from "../StatusCard/Card";
@@ -100,7 +101,10 @@ const HomePage = () => {
       if (groupedExpenses[key]) {
         // Nếu khóa đã tồn tại, thêm expense vào mảng tương ứng
         groupedExpenses[key].push({
+          categoryId: transaction.id,
+
           id: expense.id,
+          title,
           location,
           description,
           total,
@@ -112,7 +116,9 @@ const HomePage = () => {
         // Nếu khóa chưa tồn tại, tạo khóa mới và gán một mảng chứa expense
         groupedExpenses[key] = [
           {
+            categoryId: transaction.id,
             id: expense.id,
+            title,
             location,
             description,
             total,
@@ -243,10 +249,9 @@ const HomePage = () => {
   //gom nhóm theo date
 
   return (
-    <View
+    <ScrollView
       style={{
         flex: 1,
-        alignItems: "center",
         backgroundColor: "#F8EFFF",
       }}
     >
@@ -279,16 +284,19 @@ const HomePage = () => {
       </View>
       <View
         style={{
+          flex: 1,
+          alignItems: "center",
           marginTop: 10,
         }}
       ></View>
-      <LineChartComponent />
-
+      <View>
+        <LineChartComponent />
+      </View>
       <StatusCard />
       <View style={{ marginTop: 10 }}>{renderHeaderRecentTransactions()}</View>
       <RecentTransaction transactions={transactions} incomes={incomes} />
       {/* <History /> */}
-    </View>
+    </ScrollView>
   );
 };
 const styles = StyleSheet.create({
@@ -321,7 +329,7 @@ const styles = StyleSheet.create({
     color: "white",
   },
   recentTransactionHeader: {
-    width: 300,
+    width: 380,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",

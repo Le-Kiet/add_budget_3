@@ -14,7 +14,88 @@ const History = () => {
   const confirmStatus = "C";
   const pendingStatus = "P";
   const { transactions, deleteTransaction } = useContext(GlobalContext);
+  const groupedTransactions = {};
+  transactions.forEach((transaction) => {
+    const date = transaction.date;
+    if (!groupedTransactions[date]) {
+      groupedTransactions[date] = [transaction];
+    } else {
+      groupedTransactions[date].push(transaction);
+    }
+  });
 
+  // In ra kết quả gom nhóm
+  console.log(groupedTransactions);
+  // Tạo đối tượng chứa thông tin tổng hợp theo ngà
+  // Khởi tạo một đối tượng để lưu trữ dữ liệu gom nhóm
+  const groupedExpenses = {};
+
+  // Duyệt qua mảng "transactions"
+  transactions.forEach((transaction) => {
+    // Duyệt qua mảng "expenses" trong mỗi giao dịch
+    transaction.expenses.forEach((expense) => {
+      // Lấy giá trị của trường "title", "description", "location", "total", "date", "icon", "name" và "color" từ mục chi tiêu
+      const { title, description, location, total, date } = expense;
+      const { icon, name, color } = transaction;
+
+      // Tách ngày, tháng và năm từ trường "date"
+      const [year, month, day] = date.split("-");
+
+      // Tạo khóa cho đối tượng groupedExpenses dựa trên ngày, tháng và năm
+      const key = `${year}-${month}-${day}`;
+
+      // Kiểm tra xem khóa đã tồn tại trong groupedExpenses chưa
+      if (groupedExpenses[key]) {
+        // Nếu khóa đã tồn tại, thêm expense vào mảng tương ứng
+        groupedExpenses[key].push({
+          id: expense.id,
+          location,
+          description,
+          total,
+          icon,
+          name,
+          color,
+        });
+      } else {
+        // Nếu khóa chưa tồn tại, tạo khóa mới và gán một mảng chứa expense
+        groupedExpenses[key] = [
+          {
+            id: expense.id,
+            location,
+            description,
+            total,
+            icon,
+            name,
+            color,
+          },
+        ];
+      }
+    });
+  });
+  const getFormattedDate = (date) => {
+    const currentDate = new Date();
+    const formattedDate = new Date(date);
+
+    if (
+      formattedDate.getDate() === currentDate.getDate() &&
+      formattedDate.getMonth() === currentDate.getMonth() &&
+      formattedDate.getFullYear() === currentDate.getFullYear()
+    ) {
+      return "Today";
+    }
+
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    if (
+      formattedDate.getDate() === yesterday.getDate() &&
+      formattedDate.getMonth() === yesterday.getMonth() &&
+      formattedDate.getFullYear() === yesterday.getFullYear()
+    ) {
+      return "Yesterday";
+    }
+
+    return date;
+  };
   return (
     <ScrollView>
       {transactions.map((category) => (

@@ -4,6 +4,7 @@ import {
   StyleSheet,
   FlatList,
   Image,
+  ScrollView,
   TouchableOpacity,
 } from "react-native";
 import * as React from "react";
@@ -110,49 +111,229 @@ const HomeDetails = ({ navigation }) => {
       />
     );
   };
-  const groupedTransactions = transactions.reduce(
-    (groupedExpenses, category) => {
-      category.expenses.forEach((expense) => {
-        const transactionDate = new Date(expense.date).toDateString();
+  // const groupedTransactions = transactions.reduce(
+  //   (groupedExpenses, category) => {
+  //     category.expenses.forEach((expense) => {
+  //       const transactionDate = new Date(expense.date).toDateString();
 
-        if (!groupedExpenses[transactionDate]) {
-          groupedExpenses[transactionDate] = [];
-        }
+  //       if (!groupedExpenses[transactionDate]) {
+  //         groupedExpenses[transactionDate] = [];
+  //       }
 
-        groupedExpenses[transactionDate].push({
-          category: category,
-          expense: expense,
-        });
-      });
+  //       groupedExpenses[transactionDate].push({
+  //         category: category,
+  //         expense: expense,
+  //       });
+  //     });
 
-      return groupedExpenses;
-    },
-    {}
-  );
+  //     return groupedExpenses;
+  //   },
+  //   {}
+  // );
   const [thisDate, setThisDate] = useState("null");
+  const groupedTransactions = {};
+  transactions.forEach((transaction) => {
+    const date = transaction.date;
+    if (!groupedTransactions[date]) {
+      groupedTransactions[date] = [transaction];
+    } else {
+      groupedTransactions[date].push(transaction);
+    }
+  });
+
+  // In ra kết quả gom nhóm
+  console.log(groupedTransactions);
+  // Tạo đối tượng chứa thông tin tổng hợp theo ngà
+  // Khởi tạo một đối tượng để lưu trữ dữ liệu gom nhóm
+  const groupedExpenses = {};
+
+  // Duyệt qua mảng "transactions"
+  transactions.forEach((transaction) => {
+    // Duyệt qua mảng "expenses" trong mỗi giao dịch
+    transaction.expenses.forEach((expense) => {
+      // Lấy giá trị của trường "title", "description", "location", "total", "date", "icon", "name" và "color" từ mục chi tiêu
+      const { title, description, location, total, date } = expense;
+      const { icon, name, color } = transaction;
+
+      // Tách ngày, tháng và năm từ trường "date"
+      const [year, month, day] = date.split("-");
+
+      // Tạo khóa cho đối tượng groupedExpenses dựa trên ngày, tháng và năm
+      const key = `${year}-${month}-${day}`;
+
+      // Kiểm tra xem khóa đã tồn tại trong groupedExpenses chưa
+      if (groupedExpenses[key]) {
+        // Nếu khóa đã tồn tại, thêm expense vào mảng tương ứng
+        let truncatelocation = location;
+        let truncatedescription = description;
+        if (truncatelocation.length > 17) {
+          truncatelocation = truncatelocation.substring(0, 17) + "...";
+        }
+        if (truncatedescription.length > 13) {
+          truncatedescription = truncatedescription.substring(0, 13) + "...";
+        }
+        groupedExpenses[key].push({
+          categoryId: transaction.id,
+          id: expense.id,
+          truncatelocation,
+          truncatedescription,
+          total,
+          icon,
+          name,
+          color,
+        });
+      } else {
+        // Nếu khóa chưa tồn tại, tạo khóa mới và gán một mảng chứa expense
+        let truncatelocation = location;
+        let truncatedescription = description;
+        if (truncatelocation.length > 17) {
+          truncatelocation = truncatelocation.substring(0, 13) + "...";
+        }
+        if (truncatedescription.length > 13) {
+          truncatedescription = truncatedescription.substring(0, 13) + "...";
+        }
+        groupedExpenses[key] = [
+          {
+            categoryId: transaction.id,
+            id: expense.id,
+            truncatelocation,
+            truncatedescription,
+            total,
+            icon,
+            name,
+            color,
+          },
+        ];
+      }
+    });
+  });
+  const getFormattedDate = (date) => {
+    const currentDate = new Date();
+    const formattedDate = new Date(date);
+
+    if (
+      formattedDate.getDate() === currentDate.getDate() &&
+      formattedDate.getMonth() === currentDate.getMonth() &&
+      formattedDate.getFullYear() === currentDate.getFullYear()
+    ) {
+      return "Today";
+    }
+
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    if (
+      formattedDate.getDate() === yesterday.getDate() &&
+      formattedDate.getMonth() === yesterday.getMonth() &&
+      formattedDate.getFullYear() === yesterday.getFullYear()
+    ) {
+      return "Yesterday";
+    }
+
+    return date;
+  };
+  const ExpenseItem = ({ expense }) => {
+    return (
+      <ListItem
+        key={expense.id}
+        title={expense.title}
+        subtitle={expense.description}
+      >
+        <ListItem.Content>
+          <View style={styles.transaction}>
+            <Image
+              source={expense.icon}
+              style={{
+                width: 40,
+                height: 40,
+                marginRight: 10,
+                tintColor: expense.color,
+              }}
+            ></Image>
+            <View>
+              <Text
+                style={{
+                  fontSize: 16,
+                  color: "#57606f",
+                  fontWeight: "bold",
+                }}
+              >
+                {expense.truncatedescription}
+              </Text>
+              <Text
+                style={{
+                  fontSize: 12,
+                  color: "#a4b0be",
+                }}
+              >
+                {expense.truncatelocation}
+              </Text>
+            </View>
+          </View>
+        </ListItem.Content>
+        <ListItem color="black">
+          <ListItem.Subtitle style={styles.title}>
+            -${Math.abs(expense.total)}
+          </ListItem.Subtitle>
+        </ListItem>
+        <ListItem color="black">
+          <Icon
+            name="delete-forever"
+            type="material-icons"
+            size={28}
+            color="#EA2027"
+            onPress={() => deleteTransaction(expense.categoryId, expense.id)}
+          />
+        </ListItem>
+      </ListItem>
+    );
+  };
+  const renderGroupedExpenses = (groupedExpenses) => {
+    const sortedEntries = Object.entries(groupedExpenses).sort(
+      ([dateA], [dateB]) => new Date(dateB) - new Date(dateA)
+    );
+    let renderedItemCount = 0;
+    return (
+      <ScrollView style={styles.ListItemContainer}>
+        {sortedEntries.map(([date, expenses]) => (
+          <View key={date} style={styles.groupContainer}>
+            <Text
+              style={{ fontSize: 20, fontWeight: "bold", marginVertical: 10 }}
+            >
+              {getFormattedDate(date)}
+            </Text>
+            {expenses.map((expense) => (
+              <ExpenseItem
+                key={`${expense.total}-${expense.location}`}
+                expense={expense}
+              />
+            ))}
+          </View>
+        ))}
+      </ScrollView>
+    );
+  };
   return (
     <Animated.View
       style={{
         flex: 1,
         alignItems: "center",
         paddingVertically: 10,
+        width: 400,
         paddingHorizontal: 50,
       }}
     >
       <View
         style={{
-          // paddingVertical: 60,
           padding: 10,
-          backgroundColor: "#4CAF50", // Màu nền xanh lá
+          backgroundColor: "#4CAF50",
           borderRadius: 10,
-          width: 400, // Đặt chiều rộng là 80
-          height: 150, // Đặt chiều dài là 200
+          width: 350,
+          height: 150,
         }}
       >
         <Text style={styles.balanced}>VCB</Text>
         <Text style={styles.balanced}>Current Balanced</Text>
         <Text style={styles.currentBalanced}>{currentBalancedBalance} $</Text>
-        {/* Thêm các thành phần khác của thẻ tín dụng */}
       </View>
       <View style={styles.spending}>
         <View style={styles.income}>
@@ -176,305 +357,8 @@ const HomeDetails = ({ navigation }) => {
           </View>
         </View>
       </View>
-      <View>
-        {/* {Object.entries(groupedTransactions).map(([date, entries]) => (
-          <View key={date}>
-            <Text>{date}</Text>
-            {entries.map(({ category, expense }) => (
-              <View key={category.id}>
-                <ListItem
-                  key={expense.id}
-                  title={expense.title}
-                  subtitle={expense.description}
-                >
-                  <ListItem.Content>
-                    <View style={styles.transaction}>
-                      <View style={styles.transaction}>
-                        <Image
-                          source={expense.icon}
-                          style={{
-                            width: 40,
-                            height: 40,
-                            marginRight: 10,
-                            tintColor: expense.color,
-                          }}
-                        ></Image>
-                      </View>
-                      <View>
-                        <Text
-                          style={{
-                            fontSize: 16,
-                            color: "#57606f",
-                            fontWeight: "bold",
-                          }}
-                        >
-                          {expense.title}
-                        </Text>
-                        <Text
-                          style={{
-                            fontSize: 12,
-                            color: "#a4b0be",
-                          }}
-                        >
-                          {expense.location}
-                        </Text>
-                      </View>
-                    </View>
-                  </ListItem.Content>
-                  <ListItem color="black">
-                    <ListItem.Subtitle style={styles.title}>
-                      -${Math.abs(expense.total)}
-                    </ListItem.Subtitle>
-                  </ListItem>
-                  <ListItem color="black">
-                    <ListItem.Subtitle style={styles.title}>
-                      <Icon
-                        name="delete-forever"
-                        type="material-icons"
-                        size={28}
-                        color="#EA2027"
-                        onPress={() =>
-                          deleteTransaction(category.id, expense.id)
-                        }
-                      />
-                    </ListItem.Subtitle>
-                  </ListItem>
-                </ListItem>
-              </View>
-            ))}
-          </View>
-        ))} */}
-        {/* {transactions.map((category) => (
-          <View key={category.id}>
-            <Text>{category.name}</Text>
-            {[0, 1, 2, 3].map((daysAgo) => {
-              const targetDate = new Date(); // Ngày mục tiêu, mặc định là ngày hôm nay
-              targetDate.setDate(targetDate.getDate() - daysAgo); // Đặt ngày mục tiêu cho ngày trước
-
-              return category.expenses.map((expense) => {
-                const transactionDate = new Date(expense.date);
-
-                if (
-                  transactionDate.getDate() === targetDate.getDate() &&
-                  transactionDate.getMonth() === targetDate.getMonth() &&
-                  transactionDate.getFullYear() === targetDate.getFullYear()
-                ) {
-                  return (
-                    <ListItem
-                      key={expense.id}
-                      title={expense.title}
-                      subtitle={expense.description}
-                    >
-                      <ListItem.Content>
-                        <View style={styles.transaction}>
-                          <View style={styles.transaction}>
-                            <Image
-                              source={expense.icon}
-                              style={{
-                                width: 40,
-                                height: 40,
-                                marginRight: 10,
-                                tintColor: expense.color,
-                              }}
-                            ></Image>
-                          </View>
-                          <View>
-                            <Text
-                              style={{
-                                fontSize: 16,
-                                color: "#57606f",
-                                fontWeight: "bold",
-                              }}
-                            >
-                              {expense.title}
-                            </Text>
-                            <Text
-                              style={{
-                                fontSize: 12,
-                                color: "#a4b0be",
-                              }}
-                            >
-                              {expense.location}
-                            </Text>
-                          </View>
-                        </View>
-                      </ListItem.Content>
-                      <ListItem color="black">
-                        <ListItem.Subtitle style={styles.title}>
-                          -${Math.abs(expense.total)}
-                        </ListItem.Subtitle>
-                      </ListItem>
-                      <ListItem color="black">
-                        <ListItem.Subtitle style={styles.title}>
-                          <Icon
-                            name="delete-forever"
-                            type="material-icons"
-                            size={28}
-                            color="#EA2027"
-                            onPress={() =>
-                              deleteTransaction(category.id, expense.id)
-                            }
-                          />
-                        </ListItem.Subtitle>
-                      </ListItem>
-                    </ListItem>
-                  );
-                }
-
-                return null;
-              });
-            })}
-          </View>
-        ))} */}
-        {/* {sortedTransactions.map((transaction, index) => (
-          <ListItem
-            key={index}
-            title={transaction.title}
-            subtitle={transaction.description}
-          >
-            <ListItem.Content>
-              <View style={styles.transaction}>
-                <View style={styles.transaction}>
-                  <Image
-                    source={transaction.icon}
-                    style={{
-                      width: 40,
-                      height: 40,
-                      marginRight: 10,
-                      tintColor: transaction.color,
-                    }}
-                  ></Image>
-                </View>
-                <View>
-                  <Text
-                    style={{
-                      fontSize: 16,
-                      color: "#57606f",
-                      fontWeight: "bold",
-                    }}
-                  >
-                    {transaction.title}
-                  </Text>
-                  <Text
-                    style={{
-                      fontSize: 12,
-                      color: "#a4b0be",
-                    }}
-                  >
-                    {transaction.location}
-                  </Text>
-                </View>
-              </View>
-            </ListItem.Content>
-            <ListItem color="black">
-              <ListItem.Subtitle style={styles.title}>
-                -${Math.abs(transaction.total)}
-              </ListItem.Subtitle>
-            </ListItem>
-            <ListItem color="black">
-              <ListItem.Subtitle style={styles.title}>
-                <Icon
-                  name="delete-forever"
-                  type="material-icons"
-                  size={28}
-                  color="#EA2027"
-                  onPress={() => deleteTransaction(category.id, expense.id)}
-                />
-              </ListItem.Subtitle>
-            </ListItem>
-          </ListItem>
-        ))} */}
-        {transactions.map((category) => (
-          <View key={category.id}>
-            <View>
-              <Text>{category.name}</Text>
-              {category.expenses
-                .sort((a, b) => new Date(a.date) - new Date(b.date)) // Sắp xếp theo ngày cũ đến ngày mới
-                .map((expense) => (
-                  <ListItem key={expense.id} bottomDivider>
-                    <ListItem.Content>
-                      <View style={styles.transaction}>
-                        <View style={styles.transaction}>
-                          <Image
-                            source={category.icon}
-                            style={{
-                              width: 40,
-                              height: 40,
-                              marginRight: 10,
-                              tintColor: category.color,
-                            }}
-                          ></Image>
-                        </View>
-                        <View>
-                          <Text
-                            style={{
-                              fontSize: 16,
-                              color: "#57606f",
-                              fontWeight: "bold",
-                            }}
-                          >
-                            {expense.title}
-                          </Text>
-                          <Text
-                            style={{
-                              fontSize: 12,
-                              color: "#a4b0be",
-                            }}
-                          >
-                            {expense.location}
-                          </Text>
-                        </View>
-                      </View>
-                    </ListItem.Content>
-                    <ListItem color="black">
-                      <ListItem.Subtitle style={styles.title}>
-                        -${Math.abs(expense.total)}
-                      </ListItem.Subtitle>
-                    </ListItem>
-                    <ListItem>
-                      <ListItem.Subtitle style={styles.title}>
-                        <Icon
-                          name="delete-forever"
-                          type="material-icons"
-                          size={28}
-                          color="#EA2027"
-                          onPress={() =>
-                            deleteTransaction(category.id, expense.id)
-                          }
-                        />
-                      </ListItem.Subtitle>
-                    </ListItem>
-                  </ListItem>
-                ))}
-            </View>
-          </View>
-        ))}
-      </View>
-
-      <View style={styles.transaction}>
-        <Text>Recent Transaction</Text>
-        {/* <TouchableOpacity style={styles.seeAllButton}>
-          <Text>See All</Text>
-        </TouchableOpacity> */}
-      </View>
-      <Transactionlist transactions={transactions} />
-      {/* This View will be a component */}
-      <View style={styles.transaction}>
-        <View style={styles.transaction}>
-          <Image
-            style={styles.iconBgYellow}
-            source={require("../../assets/shopping-bag.png")}
-          ></Image>
-          <View style={{ marginLeft: 10 }}>
-            <Text>shopping</Text>
-            <Text style={styles.textSmallGrey}>a</Text>
-          </View>
-        </View>
-        <View style={{ marginLeft: 100, marginTop: 10 }}>
-          <Text style={styles.textColorRed}>-100,000đ</Text>
-          <Text style={styles.textSmallGrey}>10:00AM</Text>
-        </View>
-      </View>
+      <View>{renderGroupedExpenses(groupedExpenses)}</View>
+      <View style={styles.transaction}></View>
     </Animated.View>
   );
 };
@@ -539,6 +423,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "center",
     marginTop: 10,
+    maxWidth: 200,
   },
   textColorRed: {
     color: "red",
@@ -552,5 +437,13 @@ const styles = StyleSheet.create({
     fontSize: 20,
     color: "red",
     fontWeight: "bold",
+  },
+  ListItemContainer: {
+    flex: 1,
+    width: 400,
+  },
+  groupContainer: {
+    width: "100%",
+    padding: 10,
   },
 });

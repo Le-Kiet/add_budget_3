@@ -264,7 +264,7 @@ const Favorites = ({ navigation }) => {
           data={filteredBudgets}
           keyExtractor={(item, index) => `${item.categoryName}`}
           renderItem={({ item }) => {
-            const progress = (item.spent / item.total) * 100;
+            let progress = (item.spent / item.total) * 100;
             let backgroundColorOnComplete = "";
             if (progress > 100) progress = 100;
             if (progress >= 75) {
@@ -307,12 +307,12 @@ const Favorites = ({ navigation }) => {
                   </Svg>
                   <Text style={{ marginTop: -3 }}>{item.categoryName}</Text>
                 </View>
-                <View>
+                {/* <View>
                   <Image
                     source={require("../../assets/warning.png")}
                     style={{ height: 28, width: 28 }}
                   />
-                </View>
+                </View> */}
                 <Text style={{ fontSize: 22, fontWeight: "bold" }}>
                   Remaining ${item.total - item.spent}
                 </Text>

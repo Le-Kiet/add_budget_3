@@ -169,7 +169,7 @@ const RecentTransaction = ({ transactions, incomes }) => {
                   fontWeight: "bold",
                 }}
               >
-                {expense.description}
+                {expense.name}
               </Text>
               <Text
                 style={{
@@ -200,7 +200,7 @@ const RecentTransaction = ({ transactions, incomes }) => {
     const maxItemCount = 10; // Số lượng mục tối đa được hiển thị
 
     return (
-      <View style={styles.container}>
+      <View style={styles.ListItemContainer}>
         {sortedEntries.map(([date, expenses]) => {
           if (renderedItemCount >= maxItemCount) {
             return null; // Không hiển thị nếu đã đạt đến giới hạn
@@ -230,60 +230,7 @@ const RecentTransaction = ({ transactions, incomes }) => {
       </View>
     );
   };
-  return (
-    <View>
-      {/* <ScrollView>
-        {earliestTransactions.map((transaction, index) => (
-          <ListItem
-            key={index}
-            title={transaction.title}
-            subtitle={transaction.description}
-          >
-            <ListItem.Content>
-              <View style={styles.transaction}>
-                <View style={styles.transaction}>
-                  <Image
-                    source={transaction.icon}
-                    style={{
-                      width: 40,
-                      height: 40,
-                      marginRight: 10,
-                      tintColor: transaction.color,
-                    }}
-                  ></Image>
-                </View>
-                <View>
-                  <Text
-                    style={{
-                      fontSize: 16,
-                      color: "#57606f",
-                      fontWeight: "bold",
-                    }}
-                  >
-                    {transaction.title}
-                  </Text>
-                  <Text
-                    style={{
-                      fontSize: 12,
-                      color: "#a4b0be",
-                    }}
-                  >
-                    {transaction.location}
-                  </Text>
-                </View>
-              </View>
-            </ListItem.Content>
-            <ListItem color="black">
-              <ListItem.Subtitle style={styles.title}>
-                -${Math.abs(transaction.total)}
-              </ListItem.Subtitle>
-            </ListItem>
-          </ListItem>
-        ))}
-      </ScrollView> */}
-      {renderGroupedExpenses(groupedExpenses)}
-    </View>
-  );
+  return <View>{renderGroupedExpenses(groupedExpenses)}</View>;
 };
 const styles = StyleSheet.create({
   list: {
@@ -304,6 +251,15 @@ const styles = StyleSheet.create({
   transaction: {
     flexDirection: "row",
     justifyContent: "center",
+  },
+  ListItemContainer: {
+    flex: 1,
+    width: 400,
+    alignItems: "center",
+  },
+  groupContainer: {
+    width: "100%",
+    padding: 10,
   },
   textColorRed: {
     color: "red",

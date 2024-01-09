@@ -1,7 +1,9 @@
-import { View, Text, StyleSheet, Picker, TextInput } from "react-native";
+import { View, Text, StyleSheet, TextInput, Alert } from "react-native";
+import { Picker } from "@react-native-picker/picker";
 import React, { useState, useContext } from "react";
 import Slider from "@react-native-community/slider";
 import { TouchableOpacity } from "react-native-gesture-handler";
+import DropDownPicker from "react-native-dropdown-picker";
 import { GlobalContext } from "../contextAPI/GlobalState";
 const AddBudget = ({ navigation }) => {
   const { addBudget, transactions, incomes } = useContext(GlobalContext);
@@ -18,22 +20,6 @@ const AddBudget = ({ navigation }) => {
     setSelectedValue(itemValue);
     // Thực hiện xử lý khi giá trị được chọn thay đổi
   };
-  // const handleOnValueChange = (itemValue) => {
-  //   setSelectedTransaction(itemValue);
-
-  //   if (itemValue === "Others") {
-  //     setIcon(null);
-  //     setColor(null);
-  //   } else {
-  //     const foundTransaction = transactions.find(
-  //       (transaction) => transaction.name === itemValue
-  //     );
-  //     if (foundTransaction) {
-  //       setIcon(foundTransaction.icon);
-  //       setColor(foundTransaction.color);
-  //     }
-  //   }
-  // };
 
   const onBudgetChange = (value) => {
     setBudget(value);
@@ -67,19 +53,32 @@ const AddBudget = ({ navigation }) => {
           if (formattedDate === budgets.date) {
             const confirmMessage =
               "Bạn có muốn thay thế giá trị mới cho budget không?";
-            const shouldReplace = window.confirm(confirmMessage);
-            if (shouldReplace) {
-              const newBudget = {
-                id: category.budget[index].id,
-                total: budget,
-                spent: 0,
-                date: formattedDate,
-              };
-              console.log(newBudget, "new budget");
-              category.budget[index] = replaceBudget(newBudget); // Thay thế budget mới
-            }
-            shouldStop = true;
+            Alert.alert(
+              "Xác nhận",
+              confirmMessage,
+              [
+                {
+                  text: "Không",
+                  style: "cancel",
+                },
+                {
+                  text: "Có",
+                  onPress: () => {
+                    const newBudget = {
+                      id: category.budget[index].id,
+                      total: budget,
+                      spent: 0,
+                      date: formattedDate,
+                    };
+                    console.log(newBudget, "new budget");
+                    category.budget[index] = replaceBudget(newBudget); // Thay thế budget mới
+                  },
+                },
+              ],
+              { cancelable: false }
+            );
 
+            shouldStop = true;
             return true;
           }
         });
@@ -106,34 +105,34 @@ const AddBudget = ({ navigation }) => {
     const numericValue = parseInt(text, 10);
     setBudget(numericValue);
   };
+  const [open, setOpen] = useState(false);
+  const transactionNames = transactions.map((transaction) => ({
+    label: transaction.name,
+    value: transaction.name,
+  }));
+  const [pickerItem, setPickerItem] = useState(transactionNames);
+
   console.log(selectedTransaction, "...");
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Budget Planner</Text>
-      <Text style={styles.title}>Your Balanced: 2000$</Text>
       <Text style={styles.budgetText}>Current Budget: {budget}$</Text>
       <Slider
         style={styles.slider}
         minimumValue={0}
-        maximumValue={2000}
+        maximumValue={100000}
         step={100}
         value={budget}
         onValueChange={onBudgetChange}
       />
-      <Picker
-        style={styles.picker}
-        selectedValue={selectedValue}
-        onValueChange={handleSelectChange} // onValueChange={(itemValue) => handleOnValueChange(itemValue)}
-      >
-        <Picker.Item label="Select a transaction" value="" />
-        {selectedTransaction.map((transaction) => (
-          <Picker.Item
-            key={transaction}
-            label={transaction}
-            value={transaction}
-          />
-        ))}
-      </Picker>
+      <DropDownPicker
+        style={{ marginTop: 20 }}
+        items={pickerItem}
+        value={selectedValue}
+        open={open}
+        setOpen={setOpen}
+        setValue={handleSelectChange}
+      />
+
       <TextInput
         style={styles.input}
         keyboardType="numeric"
@@ -146,12 +145,14 @@ const AddBudget = ({ navigation }) => {
           setBudget(isNaN(numericValue) ? 0 : numericValue);
         }}
       />
-      <TouchableOpacity
-        onPress={() => NewBudget()}
-        style={styles.addBudgetButton}
-      >
-        <Text style={styles.addBudgetText}>Create a budget</Text>
-      </TouchableOpacity>
+      <View style={{ alignItems: "center" }}>
+        <TouchableOpacity
+          onPress={() => NewBudget()}
+          style={styles.addBudgetButton}
+        >
+          <Text style={styles.addBudgetText}>Create a budget</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };

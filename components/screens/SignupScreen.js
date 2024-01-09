@@ -147,7 +147,7 @@ const SignUpScreen = () => {
       />
 
       <TouchableOpacity style={styles.button} onPress={signUp}>
-        <Text style={styles.buttonText}>Sign Up FireBase</Text>
+        <Text style={styles.buttonText}>Sign Up</Text>
       </TouchableOpacity>
       {/* <TouchableOpacity style={styles.button} onPress={handleSignUp}>
         <Text style={styles.buttonText}>Sign Up</Text>

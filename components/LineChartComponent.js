@@ -82,9 +82,6 @@ const LineChartComponent = () => {
           const incomeDate = new Date(income.label);
           const year = incomeDate.getFullYear();
           const month = incomeDate.getMonth() + 1;
-
-          console.log(income, "income");
-          console.log(accumulator, "accumulator1");
           const key = `${month}/${year}`;
 
           if (!accumulator[key]) {
@@ -94,47 +91,58 @@ const LineChartComponent = () => {
             };
           }
           accumulator[key].total += income.total;
-          console.log(accumulator, "accumulator");
           return accumulator;
         }, []);
       case "week":
-        return incomeGroupedData.reduce((accumulator, income) => {
-          const incomeDate = new Date(income.date);
+        const weekNumbers = [];
+        incomeGroupedData.forEach((income) => {
+          const incomeDate = new Date(income.label);
           const year = incomeDate.getFullYear();
           const week = getWeekNumber(incomeDate);
-          const existingItem = accumulator.find(
-            (item) => item.label === `${week}/${year}`
-          );
+          const label = `${week}/${year}`;
 
-          if (existingItem) {
-            existingItem.total += income.total;
-          } else {
-            accumulator.push({
-              label: `${week}/${year}`,
-              total: income.total,
-            });
+          if (!weekNumbers.includes(label)) {
+            weekNumbers.push(label);
           }
+        });
 
-          return accumulator;
-        }, []);
+        return weekNumbers.map((label) => {
+          const total = incomeGroupedData.reduce((sum, income) => {
+            const incomeDate = new Date(income.label);
+            const year = incomeDate.getFullYear();
+            const week = getWeekNumber(incomeDate);
+            const incomeLabel = `${week}/${year}`;
+
+            return incomeLabel === label ? sum + income.total : sum;
+          }, 0);
+          return { label, total };
+        });
+
       case "day":
-        return incomeGroupedData.reduce((accumulator, income) => {
-          const incomeDate = new Date(income.date);
+        const dates = [];
+        incomeGroupedData.forEach((income) => {
+          const incomeDate = new Date(income.label);
           const year = incomeDate.getFullYear();
-          const day = incomeDate.getDate();
           const month = incomeDate.getMonth() + 1;
+          const day = incomeDate.getDate();
           const label = `${month}/${day}/${year}`;
 
-          const existingItem = accumulator.find((item) => item.label === label);
-
-          if (existingItem) {
-            existingItem.total += income.total;
-          } else {
-            accumulator.push({ label, total: income.total });
+          if (!dates.includes(label)) {
+            dates.push(label);
           }
+        });
+        return dates.map((label) => {
+          const total = incomeGroupedData.reduce((sum, income) => {
+            const incomeDate = new Date(income.label);
+            const year = incomeDate.getFullYear();
+            const month = incomeDate.getMonth() + 1;
+            const day = incomeDate.getDate();
+            const incomeLabel = `${month}/${day}/${year}`;
 
-          return accumulator;
-        }, []);
+            return incomeLabel === label ? sum + income.total : sum;
+          }, 0);
+          return { label, total };
+        });
       default:
         return [];
     }
@@ -190,45 +198,62 @@ const LineChartComponent = () => {
           return accumulator;
         }, []);
       case "week":
-        return data.reduce((accumulator, expense) => {
-          const expenseDate = new Date(expense.date);
+        const weekNumbers = [];
+        expenseGroupedData.forEach((expense) => {
+          const expenseDate = new Date(expense.label);
           const year = expenseDate.getFullYear();
           const week = getWeekNumber(expenseDate);
-          const existingItem = accumulator.find(
-            (item) => item.label === `${week}/${year}`
-          );
+          const label = `${week}/${year}`;
 
-          if (existingItem) {
-            existingItem.total += expense.total;
-          } else {
-            accumulator.push({
-              label: `${week}/${year}`,
-              total: expense.total,
-            });
+          if (!weekNumbers.includes(label)) {
+            weekNumbers.push(label);
           }
-          console.log(accumulator, "accumulatorexpenseweek");
+        });
 
-          return accumulator;
-        }, []);
+        return weekNumbers.map((label) => {
+          const total = expenseGroupedData.reduce((sum, expense) => {
+            const expenseDate = new Date(expense.label);
+            const year = expenseDate.getFullYear();
+            const week = getWeekNumber(expenseDate);
+            const expenseLabel = `${week}/${year}`;
+
+            return expenseLabel === label ? sum + expense.total : sum;
+          }, 0);
+          return { label, total };
+        });
+
       case "day":
-        return data.reduce((accumulator, expense) => {
-          const expenseDate = new Date(expense.date);
-          const year = expenseDate.getFullYear();
-          const day = expenseDate.getDate();
-          const month = expenseDate.getMonth() + 1;
-          const label = `${month}/${day}`;
+        const dates = [];
+        const startDate = new Date("2024-01-01"); // Ngày bắt đầu từ 2024-01-01
 
-          const existingItem = accumulator.find((item) => item.label === label);
+        expenseGroupedData.forEach((expense) => {
+          const expenseDate = new Date(expense.label);
 
-          if (existingItem) {
-            existingItem.total += expense.total;
-          } else {
-            accumulator.push({ label, total: expense.total });
+          // Chỉ xử lý các khoản chi tiêu từ ngày 2024-01 trở đi
+          if (expenseDate >= startDate) {
+            const year = expenseDate.getFullYear();
+            const month = expenseDate.getMonth() + 1;
+            const day = expenseDate.getDate();
+            const label = `${month}/${day}/${year}`;
+
+            if (!dates.includes(label)) {
+              dates.push(label);
+            }
           }
-          console.log(accumulator, "accumulatorexpenseday");
+        });
 
-          return accumulator;
-        }, []);
+        return dates.map((label) => {
+          const total = expenseGroupedData.reduce((sum, expense) => {
+            const expenseDate = new Date(expense.label);
+            const year = expenseDate.getFullYear();
+            const month = expenseDate.getMonth() + 1;
+            const day = expenseDate.getDate();
+            const expenseLabel = `${month}/${day}/${year}`;
+
+            return expenseLabel === label ? sum + expense.total : sum;
+          }, 0);
+          return { label, total };
+        });
       default:
         return [];
     }
@@ -366,7 +391,7 @@ const LineChartComponent = () => {
           labels: labels,
           datasets: datasets,
         }}
-        width={300} // Width of the chart
+        width={420} // Width of the chart
         height={220} // Height of the chart
         chartConfig={chartProps}
         bezier // Use bezier curve for smooth lines
@@ -376,6 +401,7 @@ const LineChartComponent = () => {
       />
       {renderTooltip()}
       <Button
+        style={{ width: 400 }}
         title={`Switch to ${
           chartType === "month"
             ? "week"
@@ -390,110 +416,3 @@ const LineChartComponent = () => {
 };
 
 export default LineChartComponent;
-// const LineChartComponent = () => {
-//   const { addTransaction, transactions, incomes } = useContext(GlobalContext);
-//   const [date, setDate] = useState("");
-//   const [categories, setCategories] = React.useState(transactions);
-//   // Tạo một đối tượng Map để lưu trữ tổng tiền tiêu trong từng ngày
-//   const dailyExpenseMap = new Map();
-
-//   // Duyệt qua các mục tiêu trong dữ liệu
-//   transactions.forEach((category) => {
-//     category.expenses.forEach((expense) => {
-//       const expenseDate = new Date(expense.date).toLocaleDateString();
-
-//       // Nếu ngày đã tồn tại trong Map, cộng tổng tiền tiêu vào
-//       if (dailyExpenseMap.has(expenseDate)) {
-//         const currentTotal = dailyExpenseMap.get(expenseDate);
-//         dailyExpenseMap.set(expenseDate, currentTotal + expense.total);
-//       }
-//       // Nếu ngày chưa tồn tại trong Map, khởi tạo tổng tiền tiêu cho ngày đó
-//       else {
-//         dailyExpenseMap.set(expenseDate, expense.total);
-//       }
-//     });
-//   });
-
-//   // Chuyển đổi đối tượng Map thành mảng các đối tượng với ngày tăng dần
-//   const dailyExpenses = Array.from(dailyExpenseMap).map(([date, total]) => ({
-//     date,
-//     total,
-//   }));
-
-//   // Sắp xếp mảng theo ngày tăng dần
-//   dailyExpenses.sort((a, b) => new Date(a.date) - new Date(b.date));
-//   console.log(dailyExpenses, "daily");
-//   return (
-//     <View>
-//       <Chart
-//         style={{ height: 200, width: 400 }}
-//         padding={{ left: 40, bottom: 20, right: 20, top: 20 }}
-//         xDomain={{
-//           type: Date,
-//           min: 0,
-//           max: 100,
-//           // min: new Date(2023, 11, 31), // Ngày tháng bắt đầu
-//           // max: new Date(2023, 12, 31), // Ngày tháng kết thúc
-
-//           //   min: new Date(dailyExpenses[0].date),
-//           //   max: new Date(dailyExpenses[dailyExpenses.length - 1].date),
-//         }}
-//         yDomain={{ min: 0, max: 20 }}
-//       >
-//         <VerticalAxis
-//           tickCount={10}
-//           theme={{ labels: { formatter: (v) => v.toFixed(2) } }}
-//         />
-//         <HorizontalAxis />
-//         <Line
-//           theme={{
-//             stroke: { color: "#1abc9c", width: 1 },
-//           }}
-//           data={dailyExpenses.map((expense) => ({
-//             x: new Date(expense.date),
-//             y: expense.total,
-//           }))}
-//         />
-//       </Chart>
-//       {/* <Area
-//           theme={{
-//             gradient: {
-//               from: { color: "#1abc9c", opacity: 0.4 },
-//               to: { color: "#1abc9c", opacity: 0.4 },
-//             },
-//           }}
-//           smoothing="cubic-spline"
-//           data={[
-//             { x: -2, y: 15 },
-//             { x: -1, y: 10 },
-//             { x: 0, y: 12 },
-//             { x: 5, y: 8 },
-//             { x: 6, y: 12 },
-//             { x: 9, y: 13.5 },
-//             { x: 10, y: 15 },
-//           ]}
-//         />
-//         <Area
-//           theme={{
-//             gradient: {
-//               from: { color: "#f39c12", opacity: 0.4 },
-//               to: { color: "#f39c12", opacity: 0.4 },
-//             },
-//           }}
-//           smoothing="cubic-spline"
-//           data={[
-//             { x: -2, y: 0 },
-//             { x: -1, y: 2 },
-//             { x: 0, y: 7 },
-//             { x: 2, y: 5 },
-//             { x: 3, y: 12 },
-//             { x: 7, y: 16 },
-//             { x: 9, y: 17 },
-//             { x: 10, y: 12 },
-//           ]}
-//         /> */}
-//       {/* </Chart> */}
-//     </View>
-//   );
-// };
-// export default LineChartComponent;

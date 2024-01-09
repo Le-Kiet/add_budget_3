@@ -2,12 +2,17 @@ import React, { useState, useContext } from "react";
 import {
   View,
   Text,
-  Picker,
   StyleSheet,
   Image,
+  SafeAreaView,
+  // Picker,
   Dimensions,
   TouchableWithoutFeedback,
 } from "react-native";
+import { Picker } from "@react-native-picker/picker";
+import ModalSelector from "react-native-modal-selector";
+import RNPickerSelect from "react-native-picker-select";
+//picker
 import { useRoute } from "@react-navigation/native";
 import { Input, Button, Icon, TouchableOpacity } from "react-native-elements";
 import { GlobalContext } from "../contextAPI/GlobalState";
@@ -16,6 +21,7 @@ import { COLORS, FONTS, SIZES, icons, images } from "../../constants";
 import ColorPicker from "react-native-wheel-color-picker";
 import DropDownPicker from "react-native-dropdown-picker";
 import moment from "moment";
+import { ScrollView } from "react-native-gesture-handler";
 const TransactionForm = ({ navigation }) => {
   const route = useRoute();
   const { addIncome, addExpense } = route.params;
@@ -102,6 +108,7 @@ const TransactionForm = ({ navigation }) => {
         // Tạo đối tượng giao dịch mới
         const currentDate = new Date();
         const formattedDate = currentDate.toISOString().slice(0, 10);
+        // if (color==null)
         const newTransaction = {
           id: Math.floor(Math.random() * 100000000),
           title: description,
@@ -118,7 +125,7 @@ const TransactionForm = ({ navigation }) => {
         addRecentTransaction(newTransaction);
         setText("");
         setAmount("0");
-      } else if (selectedTransaction === "Others") {
+      } else if (selectedTransaction == "Others") {
         // Create a new category for "Others"
         console.log(selectedIcon, 1);
         const newCategory = {
@@ -126,6 +133,7 @@ const TransactionForm = ({ navigation }) => {
           name: otherTransaction,
           icon: selectedIcon,
           color: selectedColor,
+          budget: [],
           expenses: [],
         };
         const currentDate = new Date();
@@ -196,7 +204,7 @@ const TransactionForm = ({ navigation }) => {
         addRecentTransaction(newIncome);
         setText("");
         setAmount("0");
-      } else if (selectedTransaction === "Others") {
+      } else if (selectedTransaction == "Others") {
         // Create a new category for "Others"
         console.log(selectedIcon, 1);
         const newCategory = {
@@ -204,6 +212,7 @@ const TransactionForm = ({ navigation }) => {
           name: otherTransaction,
           icon: selectedIcon,
           color: selectedColor,
+          budget: [],
           income: [],
         };
         const currentDate = new Date();
@@ -221,7 +230,10 @@ const TransactionForm = ({ navigation }) => {
           status: confirmStatus,
           date: formattedDate,
         };
-
+        // const newBudget={
+        //   id: Math.floor(Math.random() * 100000000),
+        // }
+        // newCategory.budget.push(newBudget)
         newCategory.income.push(newIncome);
         transactions.push(newCategory);
 
@@ -236,141 +248,172 @@ const TransactionForm = ({ navigation }) => {
     }
   };
   const [recentHistory, setRecentHistory] = useState([]);
+  //picker
   const [open, setOpen] = useState(false);
+  const [openIcon, setOpenIcon] = useState(false);
+
   const [value, setValue] = useState(null);
   const [items, setItems] = useState([
     { label: "Apple", value: "apple" },
     { label: "Banana", value: "banana" },
+    { label: "Pear", value: "pear" },
   ]);
+
+  const othersOption = { label: "Others", value: "Others" };
+  const incomeNames = incomes.map((income) => ({
+    label: income.name,
+    value: income.name,
+  }));
+  const transactionNames = transactions.map((transaction) => ({
+    label: transaction.name,
+    value: transaction.name,
+  }));
+  const updatedIncomeNames = incomeNames.concat(othersOption);
+
+  const updatedTransactionNames = transactionNames.concat(othersOption);
+  const [pickerIncomeItem, setPickerIncomeItem] = useState(updatedIncomeNames);
+
+  const [pickerItem, setPickerItem] = useState(updatedTransactionNames);
+
+  console.log(pickerItem, "123");
+  console.log(updatedTransactionNames, "updatedTransactionNames");
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Create new Transaction</Text>
-      <View style={styles.pickerContainer}>
-        <Picker
-          style={styles.picker}
-          selectedValue={selectedTransaction}
-          onValueChange={(itemValue) => handleOnValueChange(itemValue)}
-        >
-          {addExpense === true &&
-            transactions.map((transaction) => (
-              <Picker.Item
-                key={transaction.id}
-                label={transaction.name}
-                value={transaction.name}
-              />
-            ))}
-          {addIncome === true &&
-            incomes.map((income) => (
-              <Picker.Item
-                key={income.id}
-                label={income.name}
-                value={income.name}
-              />
-            ))}
-          <Picker.Item label="Others" value="Others" />
-        </Picker>
-      </View>
-      {selectedTransaction === "Others" && (
-        <View>
-          <View>{/* <View style={{ marginTop: 100 }}></View> */}</View>
-          <Input
-            style={styles.input}
-            value={otherTransaction}
-            onChangeText={handleOtherTransactionChange}
-            placeholder="Enter other transaction"
-          />
+    <ScrollView style={styles.container}>
+      <SafeAreaView>
+        <Text style={styles.title}>Create new Transaction</Text>
 
-          <ColorPicker
-            color={selectedColor}
-            onColorChange={handleColorChange}
-            onColorChangeComplete={handleColorPickerClose}
-          />
-        </View>
-      )}
-      <Input
-        label="TRANSACTION DESCRIPTION"
-        labelStyle={styles.label}
-        placeholder="Enter Description . . ."
-        value={description}
-        onChangeText={(text) => setDescription(text)}
-        inputContainerStyle={styles.inputContainer}
-      />
-      <Input
-        label="Location"
-        labelStyle={styles.label}
-        placeholder="Enter Location . . ."
-        value={location}
-        onChangeText={(text) => setLocation(text)}
-        inputContainerStyle={styles.inputContainer}
-      />
-      <Input
-        label="TRANSACTION AMOUNT"
-        labelStyle={styles.label}
-        keyboardType="numeric"
-        placeholder="Enter Amount . . ."
-        value={isNaN(amount) ? "0" : String(amount)}
-        onChangeText={(text) => {
-          const numericValue = Number(text);
-          setAmount(isNaN(numericValue) ? 0 : numericValue);
-        }}
-        leftIcon={
-          <Icon
-            name="attach-money"
-            type="material-icons"
-            size={18}
-            color="#2ed573"
-          />
-        }
-        inputContainerStyle={styles.inputContainer}
-      />
-      {selectedTransaction === "Others" && (
-        <View>
+        {addExpense === true && (
           <DropDownPicker
-            items={Object.keys(icons).map((iconName) => ({
-              label: iconName,
-              value: icons[iconName],
-              // icon: () => (
-              //   <Image source={icons[iconName]} style={styles.otherIcons} />
-              // ),
-            }))}
-            value={selectedIcon}
-            setValue={setSelectedIcon}
             open={open}
+            value={selectedTransaction}
+            items={pickerItem}
             setOpen={setOpen}
-            setItems={setItems}
-            defaultValue={selectedIcon}
-            containerStyle={styles.dropDownContainer}
-            style={styles.dropDownContainer}
-            itemStyle={styles.dropDownItem}
-            dropDownStyle={styles.dropDownMenu}
-            onChangeItem={(item) => setSelectedIcon(item.value)}
+            setValue={handleOnValueChange}
+            onValueChange={handleOnValueChange}
+            placeholder={"Choose a Category..."}
           />
+        )}
+        {addIncome === true && (
+          <DropDownPicker
+            open={open}
+            value={selectedTransaction}
+            items={pickerIncomeItem}
+            setOpen={setOpen}
+            setValue={handleOnValueChange}
+            onValueChange={handleOnValueChange}
+            placeholder={"Choose a Category..."}
+          />
+        )}
+        <View style={styles.pickerContainer}></View>
+        {selectedTransaction === "Others" && (
+          <View>
+            <Input
+              style={styles.input}
+              value={otherTransaction}
+              onChangeText={handleOtherTransactionChange}
+              placeholder="Enter other transaction"
+            />
 
-          {/* <ColorPicker
+            <ColorPicker
+              color={selectedColor}
+              onColorChange={handleColorChange}
+              onColorChangeComplete={handleColorPickerClose}
+            />
+          </View>
+        )}
+
+        <View style={{ marginTop: 30 }}></View>
+        <Input
+          label="TRANSACTION DESCRIPTION"
+          labelStyle={styles.label}
+          placeholder="Enter Description . . ."
+          value={description}
+          onChangeText={(text) => setDescription(text)}
+          inputContainerStyle={styles.inputContainer}
+        />
+        <Input
+          label="Location"
+          labelStyle={styles.label}
+          placeholder="Enter Location . . ."
+          value={location}
+          onChangeText={(text) => setLocation(text)}
+          inputContainerStyle={styles.inputContainer}
+        />
+        <Input
+          label="TRANSACTION AMOUNT"
+          labelStyle={styles.label}
+          keyboardType="numeric"
+          placeholder="Enter Amount . . ."
+          value={isNaN(amount) ? "0" : String(amount)}
+          onChangeText={(text) => {
+            const numericValue = Number(text);
+            setAmount(isNaN(numericValue) ? 0 : numericValue);
+          }}
+          leftIcon={
+            <Icon
+              name="attach-money"
+              type="material-icons"
+              size={18}
+              color="#2ed573"
+            />
+          }
+          inputContainerStyle={styles.inputContainer}
+        />
+        {selectedTransaction === "Others" && (
+          <View>
+            <DropDownPicker
+              items={Object.keys(icons).map((iconName) => ({
+                label: iconName,
+                value: icons[iconName],
+                icon: () => (
+                  <Image
+                    source={icons[iconName]}
+                    style={{ width: 30 }}
+                    resizeMode="contain"
+                  />
+                ),
+                // icon: () => (
+                //   <Image source={icons[iconName]} style={styles.otherIcons} />
+                // ),
+              }))}
+              value={selectedIcon}
+              setValue={setSelectedIcon}
+              open={open}
+              setOpen={setOpen}
+              setItems={setItems}
+              defaultValue={selectedIcon}
+              containerStyle={styles.dropDownContainer}
+              style={styles.dropDownContainer}
+              itemStyle={styles.dropDownItem}
+              dropDownStyle={styles.dropDownMenu}
+              onChangeItem={(item) => setSelectedIcon(item.value)}
+            />
+
+            {/* <ColorPicker
               color={selectedColor}
               onColorChange={handleColorChange}
               onColorChangeComplete={handleColorPickerClose}
             /> */}
+          </View>
+        )}
+        <View style={styles.buttonContainer}>
+          {addExpense === true && (
+            <Button
+              buttonStyle={[styles.button, styles.cashOutButton]}
+              title="- CASH OUT"
+              onPress={() => onSubmit()}
+            />
+          )}
+          {addIncome === true && (
+            <Button
+              buttonStyle={[styles.button, styles.cashInButton]}
+              title="+ CASH IN"
+              onPress={() => onWithdraw()}
+            />
+          )}
         </View>
-      )}
-      <View style={{ marginTop: 100 }}></View>
-      <View style={styles.buttonContainer}>
-        {addExpense === true && (
-          <Button
-            buttonStyle={[styles.button, styles.cashOutButton]}
-            title="- CASH OUT"
-            onPress={() => onSubmit()}
-          />
-        )}
-        {addIncome === true && (
-          <Button
-            buttonStyle={[styles.button, styles.cashInButton]}
-            title="+ CASH IN"
-            onPress={() => onWithdraw()}
-          />
-        )}
-      </View>
-    </View>
+      </SafeAreaView>
+    </ScrollView>
   );
 };
 const styles = StyleSheet.create({
